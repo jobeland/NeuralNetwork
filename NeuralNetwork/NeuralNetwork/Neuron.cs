@@ -10,24 +10,24 @@ namespace NeuralNetwork
     public class Neuron
     {
 
-        public double output { get; set; }
-        public double input { get; set; }
+        public double Output { get; set; }
+        public double Input { get; set; }
 
         public Neuron()
         {
-            output = 0;
-            input = 0;
+            Output = 0;
+            Input = 0;
         }
 
         protected double calculateActivationFunction()
         {
-            return input;
+            return Input;
         }
 
         protected void fire()
         {
-            this.output = calculateActivationFunction();
-            this.input = 0;
+            this.Output = calculateActivationFunction();
+            this.Input = 0;
         }
 
     }
