@@ -10,8 +10,8 @@ namespace NeuralNetwork
     public class Neuron
     {
 
-        protected double output { get; set; }
-        protected double input { get; set; }
+        public double output { get; set; }
+        public double input { get; set; }
 
         public Neuron()
         {
