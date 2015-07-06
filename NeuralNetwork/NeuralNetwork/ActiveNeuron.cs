@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NeuralNetwork
+namespace ArtificialNeuralNetwork
 {
     
 [Serializable]
@@ -25,15 +25,15 @@ public class ActiveNeuron : Neuron{
 	
 	public ActiveNeuron(List<ActiveNeuron> neuronsIn, int bias) {
 		ConnectionsIn = new List<Neuron>();
-		ConnectionsIn.addAll(neuronsIn);
+        ConnectionsIn.AddRange(neuronsIn);
 		Weights = new Double[ConnectionsIn.Count];
 		initializeWeights();
 		bias = 0;
 	}
 	
 	public void initBias(){
-		double val = Math.random();
-		if(Math.random() < 0.5){
+        double val = new Random().NextDouble();
+		if(new Random().NextDouble() < 0.5){
 			// 50% chance of being negative, being between -1 and 1
 			val = 0 - val;
 		}
@@ -42,9 +42,9 @@ public class ActiveNeuron : Neuron{
 	
 	private void initializeWeights(){
 		// weights assumed to always be between -1 and 1
-		for(int i = 0; i < Weights.length; i++){
-			double val = Math.random();
-			if(Math.random() < 0.5){
+		for(int i = 0; i < Weights.Length; i++){
+			double val = new Random().NextDouble();
+			if(new Random().NextDouble() < 0.5){
 				// 50% chance of being negative, being between -1 and 1
 				val = 0 - val;
 			}
@@ -54,7 +54,7 @@ public class ActiveNeuron : Neuron{
 
 	private double sumInputsAndWeightsWithBias(){
 		double sum = 0;
-		for(int i = 0; i < Weights.length; i++){
+		for(int i = 0; i < Weights.Length; i++){
 			sum += Weights[i] * ConnectionsIn[i].Output;
 		}
 		sum += this.Bias;
@@ -68,14 +68,14 @@ public class ActiveNeuron : Neuron{
 //		}else{
 //			return 0.0;
 //		}
-		return Math.tanh(resultOfSummation);
+		return Math.Tanh(resultOfSummation);
 	}
 	
-	protected override double calculateActivationFunction(){
+	public override double CalculateActivationFunction(){
 			return calculateThresholdActivationFunction();
 	}
 	
-	protected override void fire() {
+	public override void Fire() {
 		this.Output = calculateThresholdActivationFunction();
 		this.Input = 0;
 	}

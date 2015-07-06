@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NeuralNetwork
+namespace ArtificialNeuralNetwork
 {
 
     [Serializable]
@@ -28,17 +28,17 @@ namespace NeuralNetwork
 
         public void setInputs(double[] inputs)
         {
-            InputLayer.setInputs(inputs);
+            InputLayer.SetInputs(inputs);
         }
 
         public void calculate()
         {
-            InputLayer.fireAll();
-            HiddenLayer.fireAll();
-            OutputLayer.fireAll();
+            InputLayer.FireAll();
+            HiddenLayer.FireAll();
+            OutputLayer.FireAll();
         }
 
-        public double getOutput()
+        public double GetOutput()
         {
             //return getIndexOfGreatestOutputNeuron();
             return OutputLayer.NeuronsInLayer[0].Output;
@@ -57,7 +57,7 @@ namespace NeuralNetwork
                 if (n.GetType() == typeof(ActiveNeuron))
                 {
                     ActiveNeuron neuron = (ActiveNeuron)n;
-                    hiddenWeights.add(neuron.Weights);
+                    hiddenWeights.Add(neuron.Weights);
                 }
             }
             List<Double[]> outputWeights = new List<Double[]>();
@@ -66,7 +66,7 @@ namespace NeuralNetwork
                 if (n.GetType() == typeof(ActiveNeuron))
                 {
                     ActiveNeuron neuron = (ActiveNeuron)n;
-                    outputWeights.add(neuron.Weights);
+                    outputWeights.Add(neuron.Weights);
                 }
             }
 
@@ -82,7 +82,7 @@ namespace NeuralNetwork
                     hiddenBias[i++] = neuron.Bias;
                 }
             }
-            biases.add(hiddenBias);
+            biases.Add(hiddenBias);
 
 
             int sizeoutBias = OutputLayer.NeuronsInLayer.Count;
@@ -96,12 +96,12 @@ namespace NeuralNetwork
                     outBias[i++] = neuron.Bias;
                 }
             }
-            biases.add(outBias);
+            biases.Add(outBias);
 
             List<List<Double[]>> weightsToReturn = new List<List<Double[]>>();
-            weightsToReturn.add(hiddenWeights);
-            weightsToReturn.add(outputWeights);
-            weightsToReturn.add(biases);
+            weightsToReturn.Add(hiddenWeights);
+            weightsToReturn.Add(outputWeights);
+            weightsToReturn.Add(biases);
             return weightsToReturn;
 
         }
@@ -113,9 +113,9 @@ namespace NeuralNetwork
          */
         public void setWeightMatrix(List<List<Double[]>> matrix)
         {
-            List<Double[]> hiddenWeights = matrix.get(0);
-            List<Double[]> outputWeights = matrix.get(1);
-            List<Double[]> biases = matrix.get(2);
+            List<Double[]> hiddenWeights = matrix[0];
+            List<Double[]> outputWeights = matrix[1];
+            List<Double[]> biases = matrix[2];
 
             int index = 0;
             foreach (Neuron n in HiddenLayer.NeuronsInLayer)
@@ -123,8 +123,8 @@ namespace NeuralNetwork
                 if (n.GetType() == typeof(ActiveNeuron))
                 {
                     ActiveNeuron neuron = (ActiveNeuron)n;
-                    neuron.Weights = hiddenWeights.get(index);
-                    neuron.Bias = biases.get(0)[index];
+                    neuron.Weights = hiddenWeights[index];
+                    neuron.Bias = biases[0][index];
                     index++;
                 }
             }
@@ -134,8 +134,8 @@ namespace NeuralNetwork
                 if (n.GetType() == typeof(ActiveNeuron))
                 {
                     ActiveNeuron neuron = (ActiveNeuron)n;
-                    neuron.Weights = outputWeights.get(index);
-                    neuron.Bias = biases.get(1)[index];
+                    neuron.Weights = outputWeights[index];
+                    neuron.Bias = biases[1][index];
                     index++;
                 }
             }
@@ -144,7 +144,7 @@ namespace NeuralNetwork
         private int getIndexOfGreatestOutputNeuron()
         {
             List<ActiveNeuron> neurons = OutputLayer.NeuronsInLayer;
-            double maxOutput = Double.NEGATIVE_INFINITY;
+            double maxOutput = Double.MinValue;
             int indexOfMax = 0;
             for (int i = 0; i < neurons.Count; i++)
             {

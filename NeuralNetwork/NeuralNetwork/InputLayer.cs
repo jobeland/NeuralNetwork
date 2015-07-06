@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NeuralNetwork
+namespace ArtificialNeuralNetwork
 {
 
     [Serializable]
@@ -19,12 +19,12 @@ namespace NeuralNetwork
             for (int i = 0; i < numberOfNeuronsInLayer; i++)
             {
                 Neuron n = new Neuron();
-                NeuronsInLayer.add(n);
+                NeuronsInLayer.Add(n);
             }
         }
         public void SetInputs(double[] inputs)
         {
-            int length = inputs.length;
+            int length = inputs.Length;
             if (length != NeuronsInLayer.Count)
             {
                 Console.WriteLine("Warning: length of inputs does not match input layer");
@@ -43,7 +43,7 @@ namespace NeuralNetwork
         {
             foreach (Neuron n in NeuronsInLayer)
             {
-                n.fire();
+                n.Fire();
             }
         }
     }

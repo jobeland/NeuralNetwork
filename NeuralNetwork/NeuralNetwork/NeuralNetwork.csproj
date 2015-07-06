@@ -7,7 +7,7 @@
     <ProjectGuid>{31E24D6E-AFCF-4522-AEBA-CCCCD817BB85}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NeuralNetwork</RootNamespace>
+    <RootNamespace>ArtificialNeuralNetwork</RootNamespace>
     <AssemblyName>NeuralNetwork</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

@@ -15,14 +15,14 @@ namespace UnsupervisedTraining
         public EvalWorkingSet(int size)
         {
             PastEvals = new LinkedList<Double>();
-            PastEvals.Add(0.0);
+            PastEvals.AddFirst(0.0);
             this.Size = size;
         }
 
         public void AddEval(double eval)
         {
             PastEvals.AddFirst(eval);
-            if (PastEvals.size() > this.Size)
+            if (PastEvals.Count > this.Size)
             {
                 PastEvals.RemoveLast();
             }
@@ -30,7 +30,7 @@ namespace UnsupervisedTraining
 
         public bool IsStale()
         {
-            if (PastEvals.First <= PastEvals.Last)
+            if (PastEvals.First.Value <= PastEvals.Last.Value)
             {
                 return true;
             }

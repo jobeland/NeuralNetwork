@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NeuralNetwork
+namespace ArtificialNeuralNetwork
 {
     [Serializable]
     public class Neuron
@@ -19,14 +19,14 @@ namespace NeuralNetwork
             Input = 0;
         }
 
-        protected double calculateActivationFunction()
+        public virtual double CalculateActivationFunction()
         {
             return Input;
         }
 
-        protected void fire()
+        public virtual void Fire()
         {
-            this.Output = calculateActivationFunction();
+            this.Output = CalculateActivationFunction();
             this.Input = 0;
         }
 

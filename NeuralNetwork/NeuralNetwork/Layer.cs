@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NeuralNetwork
+namespace ArtificialNeuralNetwork
 {
 
     [Serializable]
@@ -20,7 +20,7 @@ namespace NeuralNetwork
             {
                 ActiveNeuron n = new ActiveNeuron(connectionsIn);
                 n.initBias();
-                NeuronsInLayer.add(n);
+                NeuronsInLayer.Add(n);
             }
         }
 
@@ -31,15 +31,15 @@ namespace NeuralNetwork
             {
                 ActiveNeuron n = new ActiveNeuron(connectionsIn, bias);
                 n.initBias();
-                NeuronsInLayer.add(n);
+                NeuronsInLayer.Add(n);
             }
         }
 
-        public void fireAll()
+        public void FireAll()
         {
             foreach (ActiveNeuron n in NeuronsInLayer)
             {
-                n.fire();
+                n.Fire();
             }
         }
 
