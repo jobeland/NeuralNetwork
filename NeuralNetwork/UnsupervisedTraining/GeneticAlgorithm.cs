@@ -86,11 +86,11 @@ namespace UnsupervisedTraining
                             }
                         }
                          int count = 0;
-        //				 for(int i = 0; i < evals.length; i++){
-        //				 count++;
-        //				 Console.WriteLine("eval: " + evals[i]);
-        //				 }
-        //				 Console.WriteLine("count: " + count);
+        				 for(int i = 0; i < Evals.Length; i++){
+        				 count++;
+        				 Console.WriteLine("eval: " + Evals[i]);
+        				 }
+        				 Console.WriteLine("count: " + count);
 
 
 
@@ -432,28 +432,28 @@ namespace UnsupervisedTraining
             return isDone;
         }
 
-        //public static void main(String[] args)
-        //{
-        //    GeneticAlgorithm evolver = new GeneticAlgorithm(500);
-        //    evolver.runEpoch();
+        public static void main(String[] args)
+        {
+            GeneticAlgorithm evolver = new GeneticAlgorithm(500);
+            evolver.runEpoch();
 
-        //    // evolver.runGeneration();
-        //    // while(!evolver.generationFinished()){
-        //    // try {
-        //    // Thread.sleep(500);
-        //    // } catch (InterruptedException e) {
-        //    // // TODO Auto-generated catch block
-        //    // e.printStackTrace();
-        //    // }
-        //    // }
-        //    // int count = 0;
-        //    // int[] results = evolver.getEvals();
-        //    // for(int i = 0; i < results.length; i++){
-        //    // count++;
-        //    // Console.WriteLine("eval: " + results[i]);
-        //    // }
-        //    // Console.WriteLine("count: " + count);
-        //}
+            // evolver.runGeneration();
+            // while(!evolver.generationFinished()){
+            // try {
+            // Thread.sleep(500);
+            // } catch (InterruptedException e) {
+            // // TODO Auto-generated catch block
+            // e.printStackTrace();
+            // }
+            // }
+            // int count = 0;
+            // int[] results = evolver.getEvals();
+            // for(int i = 0; i < results.length; i++){
+            // count++;
+            // Console.WriteLine("eval: " + results[i]);
+            // }
+            // Console.WriteLine("count: " + count);
+        }
     }
 
 }
