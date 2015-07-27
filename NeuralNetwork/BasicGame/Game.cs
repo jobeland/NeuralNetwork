@@ -13,10 +13,15 @@ namespace BasicGame
         public Tuple<int, int> CurrentCoord { get; set; }
         public int Width;
         public int Length;
+        private static int HIGHEST_VALUE = 999999;
 
-        public Game(int width, int length)
+        public Game(int width, int length, int movesAllowed)
         {
             Board = new Dictionary<Tuple<int, int>, GameCell>();
+            MovesLeft = movesAllowed;
+            Width = width;
+            Length = length;
+            CurrentCoord = new Tuple<int, int>(0, 0);
             for (int i = 0; i < length; i++)
             {
                 for (int j = 0; j < width; j++)
@@ -127,29 +132,29 @@ namespace BasicGame
             return true;
         }
 
-        public bool UseTurn(DirectionEnum direction)
+        public bool UseTurn(MoveDirection direction)
         {
+            MovesLeft--;
             if(CanMove(CurrentCoord.Item1, CurrentCoord.Item2, direction))
             {
-                if(direction == DirectionEnum.DOWN)
+                if(direction == MoveDirection.DOWN)
                 {
                     CurrentCoord = new Tuple<int, int>(CurrentCoord.Item1, CurrentCoord.Item2 + 1);
                 }
-                else if(direction == DirectionEnum.LEFT)
+                else if(direction == MoveDirection.LEFT)
                 {
                     CurrentCoord = new Tuple<int, int>(CurrentCoord.Item1 - 1, CurrentCoord.Item2);
                 }
-                else if(direction == DirectionEnum.RIGHT)
+                else if(direction == MoveDirection.RIGHT)
                 {
                     CurrentCoord = new Tuple<int, int>(CurrentCoord.Item1 + 1, CurrentCoord.Item2);
                 }
-                else if(direction == DirectionEnum.UP)
+                else if(direction == MoveDirection.UP)
                 {
                     CurrentCoord = new Tuple<int, int>(CurrentCoord.Item1, CurrentCoord.Item2 - 1);
                 }
                 return EatDot(CurrentCoord.Item1, CurrentCoord.Item2);
             }
-            MovesLeft--;
             return false;
         }
 
@@ -205,22 +210,22 @@ namespace BasicGame
             return sb.ToString();
         }
 
-        public bool CanMove(int x, int y, DirectionEnum direction)
+        public bool CanMove(int x, int y, MoveDirection direction)
         {
             GameCell cell = Board[new Tuple<int, int>(x, y)];
-            if (direction == DirectionEnum.DOWN)
+            if (direction == MoveDirection.DOWN)
             {
                 return cell.CanMoveDown;
             }
-            if (direction == DirectionEnum.LEFT)
+            if (direction == MoveDirection.LEFT)
             {
                 return cell.CanMoveLeft;
             }
-            if (direction == DirectionEnum.RIGHT)
+            if (direction == MoveDirection.RIGHT)
             {
                 return cell.CanMoveRight;
             }
-            if (direction == DirectionEnum.UP)
+            if (direction == MoveDirection.UP)
             {
                 return cell.CanMoveUp;
             }
@@ -244,7 +249,7 @@ namespace BasicGame
             {
                 for (int j = 0; j < Length; j++)
                 {
-                    if (!Board[new Tuple<int, int>(j, i)].HasDot)
+                    if (Board[new Tuple<int, int>(j, i)].HasDot)
                     {
                         count++;
                     }
@@ -268,42 +273,42 @@ namespace BasicGame
             return true;
         }
 
-        public int GetDistanceToClosestDot(DirectionEnum direction, Tuple<int, int> CoordinateToUse, List<Tuple<int, int>> visited){
+        public int GetDistanceToClosestDot(MoveDirection direction, Tuple<int, int> CoordinateToUse, List<Tuple<int, int>> visited){
             if(!CanMove(CoordinateToUse.Item1, CoordinateToUse.Item2, direction))
             {
-                return int.MaxValue;
+                return HIGHEST_VALUE;
             }
             if(Board[CoordinateToUse].HasDot){
                 return 1;
             }
             else{
                 Tuple<int, int> newCoord = null; 
-                if (direction == DirectionEnum.DOWN)
+                if (direction == MoveDirection.DOWN)
                 {
                     newCoord = new Tuple<int, int>(CoordinateToUse.Item1, CoordinateToUse.Item2 + 1);
                 }
-                else if (direction == DirectionEnum.LEFT)
+                else if (direction == MoveDirection.LEFT)
                 {
                     newCoord = new Tuple<int, int>(CoordinateToUse.Item1 - 1, CoordinateToUse.Item2);
                 }
-                else if (direction == DirectionEnum.RIGHT)
+                else if (direction == MoveDirection.RIGHT)
                 {
                     newCoord = new Tuple<int, int>(CoordinateToUse.Item1 + 1, CoordinateToUse.Item2);
                 }
-                else if (direction == DirectionEnum.UP)
+                else if (direction == MoveDirection.UP)
                 {
                     newCoord = new Tuple<int, int>(CoordinateToUse.Item1, CoordinateToUse.Item2 - 1);
                 }
                 if(visited.Any(p => p.Item1 == newCoord.Item1 && p.Item2 == newCoord.Item2)){
-                    return int.MaxValue;
+                    return HIGHEST_VALUE;
                 }
                 List<Tuple<int,int>> newVisited = new List<Tuple<int,int>>();
                 newVisited.AddRange(visited);
                 newVisited.Add(newCoord);
-                int down = GetDistanceToClosestDot(DirectionEnum.DOWN, newCoord, newVisited) + 1;
-                int up = GetDistanceToClosestDot(DirectionEnum.UP, newCoord, newVisited) + 1;
-                int left = GetDistanceToClosestDot(DirectionEnum.LEFT, newCoord, newVisited) + 1;
-                int right = GetDistanceToClosestDot(DirectionEnum.RIGHT, newCoord, newVisited) + 1;
+                int down = GetDistanceToClosestDot(MoveDirection.DOWN, newCoord, newVisited) + 1;
+                int up = GetDistanceToClosestDot(MoveDirection.UP, newCoord, newVisited) + 1;
+                int left = GetDistanceToClosestDot(MoveDirection.LEFT, newCoord, newVisited) + 1;
+                int right = GetDistanceToClosestDot(MoveDirection.RIGHT, newCoord, newVisited) + 1;
 
                 return Math.Min(Math.Min(up, down), Math.Min(left, right));
             }  
@@ -319,7 +324,7 @@ namespace BasicGame
         public bool CanMoveRight { get; set; }
     }
 
-    public enum DirectionEnum
+    public enum MoveDirection
     {
         UP, DOWN, LEFT, RIGHT
     }

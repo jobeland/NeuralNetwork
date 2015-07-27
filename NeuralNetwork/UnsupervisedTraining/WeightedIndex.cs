@@ -10,6 +10,7 @@ namespace UnsupervisedTraining
     {
         public int Index;
         public double Weight;
+        public double CumlativeWeight;
 
     }
 }

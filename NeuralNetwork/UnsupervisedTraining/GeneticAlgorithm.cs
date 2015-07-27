@@ -22,6 +22,10 @@ namespace UnsupervisedTraining
         public static double MUTATE_CHANCE = 0.05;
         private object ObjectLock;
 
+        private static int INPUT_NEURONS = 1;
+        private static int HIDDEN_NEURONS = 4;
+        private static int OUTPUT_NEURONS = 1;
+
         public GeneticAlgorithm(int pop)
         {
             this.Population = pop;
@@ -31,7 +35,7 @@ namespace UnsupervisedTraining
             for (int i = 0; i < pop; i++)
             {
                 Evals[i] = -1;
-                NetsForGeneration[i] = new NeuralNetwork(5, 4, 1);//TODO: why is this a hardcoded value?
+                NetsForGeneration[i] = new NeuralNetwork(INPUT_NEURONS, HIDDEN_NEURONS, OUTPUT_NEURONS);//TODO: why is this a hardcoded value?
             }
             History = new EvalWorkingSet(50);//TODO: why is this a hardcoded value?
             ObjectLock = new object();
@@ -54,22 +58,23 @@ namespace UnsupervisedTraining
             for (int i = 0; i < NetsForGeneration.Length; i++)
             {
                 var trainingThread = new TrainingThread(NetsForGeneration[i], i, this);
-                Thread newThread = new Thread(new ThreadStart(trainingThread.ThreadRun));
-                newThread.Start();
-                threads.Add(newThread);
+                //Thread newThread = new Thread(new ThreadStart(trainingThread.ThreadRun));
+                //newThread.Start();
+                //threads.Add(newThread);
+                trainingThread.ThreadRun();
             }
 
-            // Spin for a while waiting for the started thread to become
-            // alive:
-            while (threads.Any(t => !t.IsAlive))
-            {
-                Thread.Sleep(1);
-            };
+            //// Spin for a while waiting for the started thread to become
+            //// alive:
+            //while (threads.Any(t => !t.IsAlive))
+            //{
+            //    Thread.Sleep(1);
+            //};
 
-            foreach (Thread t in threads)
-            {
-                t.Join();
-            }
+            //foreach (Thread t in threads)
+            //{
+            //    t.Join();
+            //}
 
         }
 
@@ -214,9 +219,9 @@ namespace UnsupervisedTraining
                     }
                 }
 
-                 for(int i = indicesToKeep.Length -1; i >= 0 ; i--){
-                 Console.WriteLine("eval: " + Evals[indicesToKeep[i]]);
-                 }
+                 //for(int i = indicesToKeep.Length -1; i >= 0 ; i--){
+                 //Console.WriteLine("eval: " + Evals[indicesToKeep[i]]);
+                 //}
         //		 Console.WriteLine("eval: " + evals[indicesToKeep[0]]);
                  Console.WriteLine("-------------------------------------------------");
 
@@ -255,7 +260,7 @@ namespace UnsupervisedTraining
             List<NeuralNetwork> newNets = new List<NeuralNetwork>();
             for (int i = 0; i < numToGen; i++)
             {
-                NeuralNetwork newNet = new NeuralNetwork(5, 4, 1); // CAREFUL THIS IS HARD CODED!
+                NeuralNetwork newNet = new NeuralNetwork(INPUT_NEURONS, HIDDEN_NEURONS, OUTPUT_NEURONS); 
                 newNets.Add(newNet);
             }
             return newNets;
@@ -317,7 +322,7 @@ namespace UnsupervisedTraining
                     childGenes.Add(childLayer);
                 }
 
-                NeuralNetwork child = new NeuralNetwork(5, 4, 1); // CAREFUL THESE ARE HARDCODED!
+                NeuralNetwork child = new NeuralNetwork(INPUT_NEURONS, HIDDEN_NEURONS, OUTPUT_NEURONS); 
                 child.setWeightMatrix(childGenes);
                 mutated.Add(child);
                 numMutated++;
@@ -333,22 +338,35 @@ namespace UnsupervisedTraining
             {
                 sumOfAllEvals += Evals[indicesToKeep[i]];
             }
+            if (sumOfAllEvals <= 0)
+            {
+                sumOfAllEvals = 1;
+            }
 
             List<NeuralNetwork> children = new List<NeuralNetwork>();
             for (int bred = 0; bred < numToBreed; bred++)
             {
                 List<WeightedIndex> toChooseFrom = new List<WeightedIndex>();
+                double cumulative = 0.0;
                 for (int i = 0; i < indicesToKeep.Length; i++)
                 {
                     //TODO: this weight determination algorithm should be delegated
                     double value = Evals[indicesToKeep[i]];
                     double weight = value / sumOfAllEvals;
+                    //cumulative += weight;
                     WeightedIndex index = new WeightedIndex
                     {
                         Index = indicesToKeep[i],
-                        Weight = weight
+                        Weight = weight,
+                        //CumlativeWeight = cumulative
                     };
                     toChooseFrom.Add(index);
+                }
+
+                toChooseFrom = toChooseFrom.OrderBy(index => index.Weight).ToList();
+                foreach(WeightedIndex index in toChooseFrom){
+                    index.CumlativeWeight = cumulative;
+                    cumulative += index.Weight;
                 }
 
                 // choose mother
@@ -400,20 +418,22 @@ namespace UnsupervisedTraining
                 }
                 childGenes.Add(childLayer);
             }
-            NeuralNetwork child = new NeuralNetwork(5, 4, 1); // CAREFUL THESE ARE HARDCODED! TODO: remove hardcoded
+            NeuralNetwork child = new NeuralNetwork(INPUT_NEURONS, HIDDEN_NEURONS, OUTPUT_NEURONS); 
             child.setWeightMatrix(childGenes);
             return child;
         }
 
         private WeightedIndex chooseIndex(List<WeightedIndex> indices) {
-                while (true) {
-                    foreach (WeightedIndex index in indices) {
-                        double random = new Random().NextDouble();
-                        if (random > (1 - index.Weight)) {
-                            return index;
-                        }
-                    }
-                }
+            double value = RandomGenerator.GetInstance().NextDouble() * indices[indices.Count - 1].CumlativeWeight;
+            return indices.Last(index => index.CumlativeWeight <= value);
+                //while (true) {
+                //    foreach (WeightedIndex index in indices) {
+                //        double random = RandomGenerator.GetInstance().NextDouble();
+                //        if (random > (1 - index.Weight)) {
+                //            return index;
+                //        }
+                //    }
+                //}
 
             }
 
