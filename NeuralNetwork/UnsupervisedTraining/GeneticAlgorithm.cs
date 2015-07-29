@@ -58,23 +58,16 @@ namespace UnsupervisedTraining
             for (int i = 0; i < NetsForGeneration.Length; i++)
             {
                 var trainingThread = new TrainingThread(NetsForGeneration[i], i, this);
-                //Thread newThread = new Thread(new ThreadStart(trainingThread.ThreadRun));
-                //newThread.Start();
-                //threads.Add(newThread);
+                Thread newThread = new Thread(new ThreadStart(trainingThread.ThreadRun));
+                newThread.Start();
+                threads.Add(newThread);
                 trainingThread.ThreadRun();
             }
 
-            //// Spin for a while waiting for the started thread to become
-            //// alive:
-            //while (threads.Any(t => !t.IsAlive))
-            //{
-            //    Thread.Sleep(1);
-            //};
-
-            //foreach (Thread t in threads)
-            //{
-            //    t.Join();
-            //}
+            foreach (Thread t in threads)
+            {
+                t.Join();
+            }
 
         }
 

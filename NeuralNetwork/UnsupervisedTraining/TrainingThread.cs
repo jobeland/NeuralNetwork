@@ -25,6 +25,7 @@ namespace UnsupervisedTraining
 
         public void ThreadRun()
         {
+            Console.WriteLine(string.Format("Starting Thread {0}", this.index));
             double average = 0;
             int numberOfScenariosToRun = 1;
             Array values = Enum.GetValues(typeof(MoveDirection));
@@ -56,6 +57,7 @@ namespace UnsupervisedTraining
             }
             average = average / (double)numberOfScenariosToRun;
             alg.AddEval(index, average);
+            Console.WriteLine(string.Format("Stopping Thread {0}", this.index));
         }
 
 
