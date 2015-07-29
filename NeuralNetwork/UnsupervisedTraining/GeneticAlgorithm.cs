@@ -424,15 +424,6 @@ namespace UnsupervisedTraining
         private WeightedIndex chooseIndex(List<WeightedIndex> indices) {
             double value = RandomGenerator.GetInstance().NextDouble() * indices[indices.Count - 1].CumlativeWeight;
             return indices.Last(index => index.CumlativeWeight <= value);
-                //while (true) {
-                //    foreach (WeightedIndex index in indices) {
-                //        double random = RandomGenerator.GetInstance().NextDouble();
-                //        if (random > (1 - index.Weight)) {
-                //            return index;
-                //        }
-                //    }
-                //}
-
             }
 
         public bool generationFinished()
@@ -454,23 +445,6 @@ namespace UnsupervisedTraining
         {
             GeneticAlgorithm evolver = new GeneticAlgorithm(500);
             evolver.runEpoch();
-
-            // evolver.runGeneration();
-            // while(!evolver.generationFinished()){
-            // try {
-            // Thread.sleep(500);
-            // } catch (InterruptedException e) {
-            // // TODO Auto-generated catch block
-            // e.printStackTrace();
-            // }
-            // }
-            // int count = 0;
-            // int[] results = evolver.getEvals();
-            // for(int i = 0; i < results.length; i++){
-            // count++;
-            // Console.WriteLine("eval: " + results[i]);
-            // }
-            // Console.WriteLine("count: " + count);
         }
     }
 
