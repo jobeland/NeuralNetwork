@@ -51,14 +51,6 @@ namespace UnsupervisedTraining
                 }
                 double result = 0;
                 result = g.MovesLeft + (g.Width * g.Length) - g.GetDotsLeft();
-                //if (g.IsGameWon())
-                //{
-                //    result = g.MovesLeft + (g.Width * g.Length) - g.GetDotsLeft();
-                //}
-                //else if (g.IsGameLost())
-                //{
-                //    result = g.GetDotsLeft();
-                //}
                 double[] eval = { result };
                 average += eval[0];
             }
