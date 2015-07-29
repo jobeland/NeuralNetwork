@@ -353,12 +353,10 @@ namespace UnsupervisedTraining
                     //TODO: this weight determination algorithm should be delegated
                     double value = Evals[indicesToKeep[i]];
                     double weight = value / sumOfAllEvals;
-                    //cumulative += weight;
                     WeightedIndex index = new WeightedIndex
                     {
                         Index = indicesToKeep[i],
                         Weight = weight,
-                        //CumlativeWeight = cumulative
                     };
                     toChooseFrom.Add(index);
                 }
