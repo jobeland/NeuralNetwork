@@ -15,10 +15,10 @@ namespace UnsupervisedTraining
 
         public static int GENERATIONS_PER_EPOCH = 100;
         public int Population { get; set; }
-        public int CompletedThisGeneration { get; set; }
         public double[] Evals { get; set; }
         public NeuralNetwork[] NetsForGeneration { get; set; }
         public EvalWorkingSet History { get; set; }
+        public IList<Thread> Threads { get; set; }
         public bool SavedAtleastOne = false;
         public static double MUTATE_CHANCE = 0.05;
         private object ObjectLock;
@@ -33,9 +33,9 @@ namespace UnsupervisedTraining
         public GeneticAlgorithm(int pop)
         {
             this.Population = pop;
-            this.CompletedThisGeneration = 0;
             Evals = new double[pop];
             NetsForGeneration = new NeuralNetwork[pop];
+            Threads = new List<Thread>();
             for (int i = 0; i < pop; i++)
             {
                 Evals[i] = -1;
@@ -51,67 +51,67 @@ namespace UnsupervisedTraining
             lock (ObjectLock)
             {
                 Evals[index] = value;
-                CompletedThisGeneration++;
             }
         }
 
-        public void runGeneration()
+        public void RunGeneration()
         {
-            //TODO: replace threads with a thread pool
-            List<Thread> threads = new List<Thread>();
+            //TODO: replace Threads with a thread pool
+            List<Thread> Threads = new List<Thread>();
             for (int i = 0; i < NetsForGeneration.Length; i++)
             {
                 var trainingThread = new TrainingThread(NetsForGeneration[i], i, this);
                 Thread newThread = new Thread(new ThreadStart(trainingThread.ThreadRun));
                 newThread.Start();
-                threads.Add(newThread);
-                trainingThread.ThreadRun();
+                Threads.Add(newThread);
             }
+        }
 
-            foreach (Thread t in threads)
+        public void WaitForGenerationToComplete()
+        {
+            foreach (Thread t in Threads)
             {
                 t.Join();
             }
 
+            Threads.Clear();
         }
 
-        public void runEpoch() {
-                for(int epoch = 0; epoch < 1000; epoch++){
-                    for (int generation = 0; generation < GENERATIONS_PER_EPOCH; generation++) {
-                        runGeneration();
-                        while (!generationFinished()) {
-                            try {
-                                Thread.Sleep(100);
-                            } catch (Exception e) {
-                                // TODO Auto-generated catch block
-                                Console.WriteLine(e.StackTrace);
-                            }
-                        }
-                         int count = 0;
-        				 for(int i = 0; i < Evals.Length; i++){
-        				 count++;
-        				 LoggerFactory.GetLogger().Log(LogLevel.Info, string.Format("eval: {0}", Evals[i]));
-        				 }
-        				 LoggerFactory.GetLogger().Log(LogLevel.Info, string.Format("count: {0}", count));
+        public void runEpoch()
+        {
+            for (int epoch = 0; epoch < 1000; epoch++)
+            {
+                for (int generation = 0; generation < GENERATIONS_PER_EPOCH; generation++)
+                {
+                    RunGeneration();
+                    WaitForGenerationToComplete();
 
-
-
-                        createNextGeneration();
-                        LoggerFactory.GetLogger().Log(LogLevel.Info, string.Format("Epoch: {0},  Generation: {1}", epoch, generation));
-
-        //				 if(generation % 100 == 0){
-        //					 NeuralNetwork bestPerformer = getBestPerformer();
-        //						NNUtils.saveNetwork(bestPerformer);
-        //				 }
-
+                    int count = 0;
+                    for (int i = 0; i < Evals.Length; i++)
+                    {
+                        count++;
+                        LoggerFactory.GetLogger().Log(LogLevel.Info, string.Format("eval: {0}", Evals[i]));
                     }
+                    LoggerFactory.GetLogger().Log(LogLevel.Info, string.Format("count: {0}", count));
 
-                    NeuralNetwork bestPerformer = getBestPerformer();
-                    //NNUtils.saveNetwork(bestPerformer,"TANHHidden4" + "Epoch" + epoch + "Eval" + ((int)getBestEvalOfGeneration()));
-                    // at end of epoch, save top 10% of neural networks
+
+
+                    createNextGeneration();
+                    LoggerFactory.GetLogger().Log(LogLevel.Info, string.Format("Epoch: {0},  Generation: {1}", epoch, generation));
+
+                    //				 if(generation % 100 == 0){
+                    //					 NeuralNetwork bestPerformer = getBestPerformer();
+                    //						NNUtils.saveNetwork(bestPerformer);
+                    //				 }
+
                 }
 
+                NeuralNetwork bestPerformer = getBestPerformer();
+                //NNUtils.saveNetwork(bestPerformer,"TANHHidden4" + "Epoch" + epoch + "Eval" + ((int)getBestEvalOfGeneration()));
+                // at end of epoch, save top 10% of neural networks
             }
+
+        }
 
         private NeuralNetwork getBestPerformer()
         {
@@ -173,82 +173,92 @@ namespace UnsupervisedTraining
             return Evals[indicesToKeep[0]];
         }
 
-        private void createNextGeneration() {
-                /*
-                 * TODO: get top 10% of current generation, save them rank the top 10%
-                 * by giving them a weight (ie if top three had 25, 24, and 23 evals,
-                 * the weight for the 25 would be 25 / (25+24+23))
-                 * 
-                 * for a certain percentage of the new generation, create by breeding
-                 * choose 2 mates stochasticly, then mix their weights (stochastically
-                 * as well, 50/50 chance?) // 70%?
-                 * 
-                 *  for a certain percentage of the new
-                 * generation, keep top performers of old generation (again, chosen
-                 * stochastically) // 10%? so keep them all? 
-                 * 
-                 * for a certain percentage of
-                 * the new generation, mutate top performers of old generation (chosen
-                 * stochastically, mutate values chosen at random with 5% chance of mutation) // 20%?
-                 * 
-                 * Also add brand new ones just to mix things up a bit and prevent a local maxima?
-                 */
+        private void createNextGeneration()
+        {
+            /*
+             * TODO: get top 10% of current generation, save them rank the top 10%
+             * by giving them a weight (ie if top three had 25, 24, and 23 evals,
+             * the weight for the 25 would be 25 / (25+24+23))
+             * 
+             * for a certain percentage of the new generation, create by breeding
+             * choose 2 mates stochasticly, then mix their weights (stochastically
+             * as well, 50/50 chance?) // 70%?
+             * 
+             *  for a certain percentage of the new
+             * generation, keep top performers of old generation (again, chosen
+             * stochastically) // 10%? so keep them all? 
+             * 
+             * for a certain percentage of
+             * the new generation, mutate top performers of old generation (chosen
+             * stochastically, mutate values chosen at random with 5% chance of mutation) // 20%?
+             * 
+             * Also add brand new ones just to mix things up a bit and prevent a local maxima?
+             */
 
-                int numberOfTopPerformersToChoose = (int) (Population * 0.50);
-                int[] indicesToKeep = new int[numberOfTopPerformersToChoose];
-                for (int i = 0; i < numberOfTopPerformersToChoose; i++) {
-                    indicesToKeep[i] = i;
-                }
-                for (int performer = 0; performer < Evals.Length; performer++) {
-                    double value = Evals[performer];
-                    for (int i = 0; i < indicesToKeep.Length; i++) {
-                        if (value > Evals[indicesToKeep[i]]) {
-                            int newIndex = performer;
-                            // need to shift all of the rest down now
-                            for (int indexContinued = i; indexContinued < numberOfTopPerformersToChoose; indexContinued++) {
-                                int oldIndex = indicesToKeep[indexContinued];
-                                indicesToKeep[indexContinued] = newIndex;
-                                newIndex = oldIndex;
-                            }
-                            break;
+            int numberOfTopPerformersToChoose = (int)(Population * 0.50);
+            int[] indicesToKeep = new int[numberOfTopPerformersToChoose];
+            for (int i = 0; i < numberOfTopPerformersToChoose; i++)
+            {
+                indicesToKeep[i] = i;
+            }
+            for (int performer = 0; performer < Evals.Length; performer++)
+            {
+                double value = Evals[performer];
+                for (int i = 0; i < indicesToKeep.Length; i++)
+                {
+                    if (value > Evals[indicesToKeep[i]])
+                    {
+                        int newIndex = performer;
+                        // need to shift all of the rest down now
+                        for (int indexContinued = i; indexContinued < numberOfTopPerformersToChoose; indexContinued++)
+                        {
+                            int oldIndex = indicesToKeep[indexContinued];
+                            indicesToKeep[indexContinued] = newIndex;
+                            newIndex = oldIndex;
                         }
+                        break;
                     }
                 }
-
-                 //for(int i = indicesToKeep.Length -1; i >= 0 ; i--){
-                 //Console.WriteLine("eval: " + Evals[indicesToKeep[i]]);
-                 //}
-        //		 Console.WriteLine("eval: " + evals[indicesToKeep[0]]);
-
-                 History.AddEval(Evals[indicesToKeep[0]]);
-        //		 if(evals[indicesToKeep[0]] >= 100 && !savedAtleastOne){
-        //			 NNUtils.saveNetwork(netsForGeneration[indicesToKeep[0]], "TANHHidden4" + "Eval" + evals[indicesToKeep[0]]);
-        //			 savedAtleastOne = true;
-        //		 }
-                 if(History.IsStale()){
-                     MUTATE_CHANCE = HIGH_MUTATION;
-                     LoggerFactory.GetLogger().Log(LogLevel.Info, "Eval history is stale, setting mutation to HIGH");
-                 }else{
-                     MUTATE_CHANCE = NORMAL_MUTATION;
-                     LoggerFactory.GetLogger().Log(LogLevel.Info, "Eval history is stale, setting mutation to NORMAL");
-                 }
-
-                List<NeuralNetwork> children = breed(indicesToKeep);
-                List<NeuralNetwork> toKeep = keep(indicesToKeep);
-                List<NeuralNetwork> mutated = mutate(indicesToKeep);
-                List<NeuralNetwork> newSpecies = getNewNetworks();
-                List<NeuralNetwork> allToAdd = new List<NeuralNetwork>();
-                allToAdd.AddRange(newSpecies);
-                allToAdd.AddRange(children);
-                allToAdd.AddRange(mutated);
-                allToAdd.AddRange(toKeep);
-
-
-                for(int net = 0; net < allToAdd.Count; net++){
-                    NetsForGeneration[net] = allToAdd[net];
-                }
-
             }
+
+            //for(int i = indicesToKeep.Length -1; i >= 0 ; i--){
+            //Console.WriteLine("eval: " + Evals[indicesToKeep[i]]);
+            //}
+            //		 Console.WriteLine("eval: " + evals[indicesToKeep[0]]);
+
+            History.AddEval(Evals[indicesToKeep[0]]);
+            //		 if(evals[indicesToKeep[0]] >= 100 && !savedAtleastOne){
+            //			 NNUtils.saveNetwork(netsForGeneration[indicesToKeep[0]], "TANHHidden4" + "Eval" + evals[indicesToKeep[0]]);
+            //			 savedAtleastOne = true;
+            //		 }
+            if (History.IsStale())
+            {
+                MUTATE_CHANCE = HIGH_MUTATION;
+                LoggerFactory.GetLogger().Log(LogLevel.Info, "Eval history is stale, setting mutation to HIGH");
+            }
+            else
+            {
+                MUTATE_CHANCE = NORMAL_MUTATION;
+                LoggerFactory.GetLogger().Log(LogLevel.Info, "Eval history is stale, setting mutation to NORMAL");
+            }
+
+            List<NeuralNetwork> children = breed(indicesToKeep);
+            List<NeuralNetwork> toKeep = keep(indicesToKeep);
+            List<NeuralNetwork> mutated = mutate(indicesToKeep);
+            List<NeuralNetwork> newSpecies = getNewNetworks();
+            List<NeuralNetwork> allToAdd = new List<NeuralNetwork>();
+            allToAdd.AddRange(newSpecies);
+            allToAdd.AddRange(children);
+            allToAdd.AddRange(mutated);
+            allToAdd.AddRange(toKeep);
+
+
+            for (int net = 0; net < allToAdd.Count; net++)
+            {
+                NetsForGeneration[net] = allToAdd[net];
+            }
+
+        }
 
         private List<NeuralNetwork> getNewNetworks()
         {
@@ -256,7 +266,7 @@ namespace UnsupervisedTraining
             List<NeuralNetwork> newNets = new List<NeuralNetwork>();
             for (int i = 0; i < numToGen; i++)
             {
-                NeuralNetwork newNet = new NeuralNetwork(INPUT_NEURONS, HIDDEN_NEURONS, OUTPUT_NEURONS); 
+                NeuralNetwork newNet = new NeuralNetwork(INPUT_NEURONS, HIDDEN_NEURONS, OUTPUT_NEURONS);
                 newNets.Add(newNet);
             }
             return newNets;
@@ -318,7 +328,7 @@ namespace UnsupervisedTraining
                     childGenes.Add(childLayer);
                 }
 
-                NeuralNetwork child = new NeuralNetwork(INPUT_NEURONS, HIDDEN_NEURONS, OUTPUT_NEURONS); 
+                NeuralNetwork child = new NeuralNetwork(INPUT_NEURONS, HIDDEN_NEURONS, OUTPUT_NEURONS);
                 child.setWeightMatrix(childGenes);
                 mutated.Add(child);
                 numMutated++;
@@ -358,7 +368,8 @@ namespace UnsupervisedTraining
                 }
 
                 toChooseFrom = toChooseFrom.OrderBy(index => index.Weight).ToList();
-                foreach(WeightedIndex index in toChooseFrom){
+                foreach (WeightedIndex index in toChooseFrom)
+                {
                     index.CumlativeWeight = cumulative;
                     cumulative += index.Weight;
                 }
@@ -412,29 +423,15 @@ namespace UnsupervisedTraining
                 }
                 childGenes.Add(childLayer);
             }
-            NeuralNetwork child = new NeuralNetwork(INPUT_NEURONS, HIDDEN_NEURONS, OUTPUT_NEURONS); 
+            NeuralNetwork child = new NeuralNetwork(INPUT_NEURONS, HIDDEN_NEURONS, OUTPUT_NEURONS);
             child.setWeightMatrix(childGenes);
             return child;
         }
 
-        private WeightedIndex chooseIndex(List<WeightedIndex> indices) {
+        private WeightedIndex chooseIndex(List<WeightedIndex> indices)
+        {
             double value = RandomGenerator.GetInstance().NextDouble() * indices[indices.Count - 1].CumlativeWeight;
             return indices.Last(index => index.CumlativeWeight <= value);
-            }
-
-        public bool generationFinished()
-        {
-            var isDone = false;
-            lock (ObjectLock)
-            {
-                if (CompletedThisGeneration == Population)
-                {
-                    CompletedThisGeneration = 0;
-                    isDone = true;
-                }
-            }
-
-            return isDone;
         }
 
         public static void main(String[] args)
