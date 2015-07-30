@@ -233,7 +233,7 @@ namespace UnsupervisedTraining
             else
             {
                 MUTATE_CHANCE = NORMAL_MUTATION;
-                LoggerFactory.GetLogger().Log(LogLevel.Info, "Eval history is stale, setting mutation to NORMAL");
+                LoggerFactory.GetLogger().Log(LogLevel.Info, "Mutation set to NORMAL");
             }
 
             List<NeuralNetwork> children = breed(indicesToKeep);
