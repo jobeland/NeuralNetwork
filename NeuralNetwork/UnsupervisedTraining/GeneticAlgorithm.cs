@@ -90,14 +90,14 @@ namespace UnsupervisedTraining
                          int count = 0;
         				 for(int i = 0; i < Evals.Length; i++){
         				 count++;
-        				 LoggerFactory.GetLogger.Log(LogLevel.Info, string.Format("eval: {0}", Evals[i]));
+        				 LoggerFactory.GetLogger().Log(LogLevel.Info, string.Format("eval: {0}", Evals[i]));
         				 }
-        				 LoggerFactory.GetLogger.Log(LogLevel.Info, string.Format("count: {0}", count));
+        				 LoggerFactory.GetLogger().Log(LogLevel.Info, string.Format("count: {0}", count));
 
 
 
                         createNextGeneration();
-                        LoggerFactory.GetLogger.Log(LogLevel.Info, string.Format("Epoch: {0},  Generation: {1}", epoch, generation));
+                        LoggerFactory.GetLogger().Log(LogLevel.Info, string.Format("Epoch: {0},  Generation: {1}", epoch, generation));
 
         //				 if(generation % 100 == 0){
         //					 NeuralNetwork bestPerformer = getBestPerformer();
@@ -227,10 +227,10 @@ namespace UnsupervisedTraining
         //		 }
                  if(History.IsStale()){
                      MUTATE_CHANCE = HIGH_MUTATION;
-                     LoggerFactory.GetLogger.Log(LogLevel.Info, "Eval history is stale, setting mutation to HIGH");
+                     LoggerFactory.GetLogger().Log(LogLevel.Info, "Eval history is stale, setting mutation to HIGH");
                  }else{
                      MUTATE_CHANCE = NORMAL_MUTATION;
-                     LoggerFactory.GetLogger.Log(LogLevel.Info, "Eval history is stale, setting mutation to NORMAL");
+                     LoggerFactory.GetLogger().Log(LogLevel.Info, "Eval history is stale, setting mutation to NORMAL");
                  }
 
                 List<NeuralNetwork> children = breed(indicesToKeep);

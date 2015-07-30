@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Logging
 {
-    interface ILogger
+    public interface ILogger
     {
-        public void Log(LogLevel level, string message);
+        void Log(LogLevel level, string message);
     }
 }
