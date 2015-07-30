@@ -1,4 +1,5 @@
 ﻿using ArtificialNeuralNetwork;
+using BasicGame;
 using Logging;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,7 @@ namespace UnsupervisedTraining
         public double[] Evals { get; set; }
         public NeuralNetwork[] NetsForGeneration { get; set; }
         public EvalWorkingSet History { get; set; }
-        public IList<Thread> Threads { get; set; }
+        public IList<TrainingSession> _sessions { get; set; }
         public bool SavedAtleastOne = false;
         public static double MUTATE_CHANCE = 0.05;
         private object ObjectLock;
@@ -35,7 +36,7 @@ namespace UnsupervisedTraining
             this.Population = pop;
             Evals = new double[pop];
             NetsForGeneration = new NeuralNetwork[pop];
-            Threads = new List<Thread>();
+            _sessions = new List<TrainingSession>();
             for (int i = 0; i < pop; i++)
             {
                 Evals[i] = -1;
@@ -45,37 +46,29 @@ namespace UnsupervisedTraining
             ObjectLock = new object();
         }
 
-        public void AddEval(int index, double value)
-        {
-            //TODO: this method should accept index I don't think, seems like this class should own that.
-            lock (ObjectLock)
-            {
-                Evals[index] = value;
-            }
-        }
-
         public void RunGeneration()
         {
-            //TODO: replace Threads with a thread pool
-            List<Thread> Threads = new List<Thread>();
+            _sessions.Clear();
             for (int i = 0; i < NetsForGeneration.Length; i++)
             {
-                var trainingThread = new TrainingThread(NetsForGeneration[i], i, this);
-                Thread newThread = new Thread(new ThreadStart(trainingThread.ThreadRun));
-                newThread.Start();
-                Threads.Add(newThread);
+                _sessions.Add(new TrainingSession(NetsForGeneration[i], new Game(10, 10, 300), i));
+                
             }
+            Parallel.ForEach<TrainingSession>(_sessions, session =>
+                {
+                    session.Run();
+                });
         }
 
-        public void WaitForGenerationToComplete()
+        public void GetEvalsForGeneration()
         {
-            foreach (Thread t in Threads)
+            //TODO: this shouldn't be in Evals anymore, but just called directly off of the training session
+            for(int i = 0; i < _sessions.Count; i++)
             {
-                t.Join();
+                Evals[i] = _sessions[i].GetSessionEvaluation();
             }
-
-            Threads.Clear();
         }
+
 
         public void runEpoch()
         {
@@ -84,7 +77,8 @@ namespace UnsupervisedTraining
                 for (int generation = 0; generation < GENERATIONS_PER_EPOCH; generation++)
                 {
                     RunGeneration();
-                    WaitForGenerationToComplete();
+
+                    GetEvalsForGeneration();
 
                     int count = 0;
                     for (int i = 0; i < Evals.Length; i++)
