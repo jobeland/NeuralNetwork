@@ -1,4 +1,5 @@
 ﻿using ArtificialNeuralNetwork;
+using Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,9 @@ namespace UnsupervisedTraining
         private static int INPUT_NEURONS = 1;
         private static int HIDDEN_NEURONS = 4;
         private static int OUTPUT_NEURONS = 1;
+
+        private static double HIGH_MUTATION = 0.5;
+        private static double NORMAL_MUTATION = 0.05;
 
         public GeneticAlgorithm(int pop)
         {
@@ -86,15 +90,14 @@ namespace UnsupervisedTraining
                          int count = 0;
         				 for(int i = 0; i < Evals.Length; i++){
         				 count++;
-        				 Console.WriteLine("eval: " + Evals[i]);
+        				 LoggerFactory.GetLogger.Log(LogLevel.Info, string.Format("eval: {0}", Evals[i]));
         				 }
-        				 Console.WriteLine("count: " + count);
+        				 LoggerFactory.GetLogger.Log(LogLevel.Info, string.Format("count: {0}", count));
 
 
 
                         createNextGeneration();
-                         Console.WriteLine("Epoch: " + epoch + ",  Generation: " + generation);
-                         Console.WriteLine("-----------------------------------");
+                        LoggerFactory.GetLogger.Log(LogLevel.Info, string.Format("Epoch: {0},  Generation: {1}", epoch, generation));
 
         //				 if(generation % 100 == 0){
         //					 NeuralNetwork bestPerformer = getBestPerformer();
@@ -216,7 +219,6 @@ namespace UnsupervisedTraining
                  //Console.WriteLine("eval: " + Evals[indicesToKeep[i]]);
                  //}
         //		 Console.WriteLine("eval: " + evals[indicesToKeep[0]]);
-                 Console.WriteLine("-------------------------------------------------");
 
                  History.AddEval(Evals[indicesToKeep[0]]);
         //		 if(evals[indicesToKeep[0]] >= 100 && !savedAtleastOne){
@@ -224,10 +226,11 @@ namespace UnsupervisedTraining
         //			 savedAtleastOne = true;
         //		 }
                  if(History.IsStale()){
-                     Console.WriteLine("MUTATION ON HIGH");
-                     MUTATE_CHANCE = 0.5;
+                     MUTATE_CHANCE = HIGH_MUTATION;
+                     LoggerFactory.GetLogger.Log(LogLevel.Info, "Eval history is stale, setting mutation to HIGH");
                  }else{
-                     MUTATE_CHANCE = 0.05;
+                     MUTATE_CHANCE = NORMAL_MUTATION;
+                     LoggerFactory.GetLogger.Log(LogLevel.Info, "Eval history is stale, setting mutation to NORMAL");
                  }
 
                 List<NeuralNetwork> children = breed(indicesToKeep);
