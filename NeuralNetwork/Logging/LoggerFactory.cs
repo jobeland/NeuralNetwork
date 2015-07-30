@@ -14,7 +14,7 @@ namespace Logging
         {
             if (instance == null)
             {
-                instance = new Log4NetLogger();
+                instance = Log4NetLogger.GetInstance();
             }
             return instance;
         }

@@ -10,6 +10,16 @@ namespace Logging
     {
         private readonly ILog _loggerImpl;
 
+        private Log4NetLogger()
+        {
+
+        }
+
+        public static Log4NetLogger GetInstance()
+        {
+            return new Log4NetLogger();
+        }
+
         public void Log(LogLevel level, string message)
         {
             switch (level)
