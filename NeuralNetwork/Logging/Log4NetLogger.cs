@@ -1,4 +1,5 @@
 ﻿using log4net;
+using log4net.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,9 @@ namespace Logging
 
         private Log4NetLogger()
         {
-
+            //TODO: consider exposing log names to create different loggers for different sections
+            _loggerImpl = LogManager.GetLogger("Main");
+            DOMConfigurator.Configure();
         }
 
         public static Log4NetLogger GetInstance()
