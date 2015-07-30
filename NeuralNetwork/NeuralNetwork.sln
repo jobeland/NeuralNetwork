@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicGame", "BasicGame\Basi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Trainer", "Trainer\Trainer.csproj", "{78DD6D2C-D364-498C-A62D-E0B12E26DB5E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logging", "Logging\Logging.csproj", "{3E71FF3F-FA56-45EB-A8FB-43B87B466826}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{78DD6D2C-D364-498C-A62D-E0B12E26DB5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{78DD6D2C-D364-498C-A62D-E0B12E26DB5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{78DD6D2C-D364-498C-A62D-E0B12E26DB5E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E71FF3F-FA56-45EB-A8FB-43B87B466826}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E71FF3F-FA56-45EB-A8FB-43B87B466826}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E71FF3F-FA56-45EB-A8FB-43B87B466826}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E71FF3F-FA56-45EB-A8FB-43B87B466826}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
