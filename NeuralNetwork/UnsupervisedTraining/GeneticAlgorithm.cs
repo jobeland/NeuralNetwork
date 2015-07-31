@@ -39,7 +39,7 @@ namespace UnsupervisedTraining
         {
             this.Population = pop;
             Evals = new double[pop];
-            _activationFunction = new SinhActivationFunction();
+            _activationFunction = new SechActivationFunction();
             NetsForGeneration = new NeuralNetwork[pop];
             _sessions = new List<TrainingSession>();
             for (int i = 0; i < pop; i++)
