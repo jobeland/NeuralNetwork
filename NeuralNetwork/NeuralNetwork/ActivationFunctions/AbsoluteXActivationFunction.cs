@@ -8,7 +8,7 @@ namespace ArtificialNeuralNetwork.ActivationFunctions
 {
     public class AbsoluteXActivationFunction : IActivationFunction
     {
-        double Calculate(double sumOfInputsAndBias)
+        public double Calculate(double sumOfInputsAndBias)
         {
             return Math.Abs(sumOfInputsAndBias);
         }
