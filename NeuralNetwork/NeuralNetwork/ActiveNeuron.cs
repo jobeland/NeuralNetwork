@@ -67,11 +67,6 @@ public class ActiveNeuron : Neuron{
 	
 	private double calculateThresholdActivationFunction(){
 		double resultOfSummation = sumInputsAndWeightsWithBias();
-//		if(resultOfSummation >= 0){
-//			return 1.0;
-//		}else{
-//			return 0.0;
-//		}
 		return _activationFunction.Calculate(resultOfSummation);
 	}
 	

@@ -43,6 +43,7 @@
     <Compile Include="ActivationFunctions\IActivationFunction.cs" />
     <Compile Include="ActivationFunctions\SechActivationFunction.cs" />
     <Compile Include="ActivationFunctions\SinhActivationFunction.cs" />
+    <Compile Include="ActivationFunctions\StepActivationFunction.cs" />
     <Compile Include="ActivationFunctions\TanhActivationFunction.cs" />
     <Compile Include="ActiveNeuron.cs" />
     <Compile Include="InputLayer.cs" />
