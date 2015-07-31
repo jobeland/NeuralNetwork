@@ -27,9 +27,9 @@ namespace UnsupervisedTraining
         private object ObjectLock;
 
 
-        private static int INPUT_NEURONS = 4;
+        private static int INPUT_NEURONS = 1;
         private static int HIDDEN_NEURONS = 3;
-        private static int OUTPUT_NEURONS = 4;
+        private static int OUTPUT_NEURONS = 1;
         private static bool USE_MULTITHREADING = true;
 
         private static double HIGH_MUTATION = 0.5;
@@ -39,7 +39,7 @@ namespace UnsupervisedTraining
         {
             this.Population = pop;
             Evals = new double[pop];
-            _activationFunction = new SechActivationFunction();
+            _activationFunction = new InverseActivationFunction();
             NetsForGeneration = new NeuralNetwork[pop];
             _sessions = new List<TrainingSession>();
             for (int i = 0; i < pop; i++)

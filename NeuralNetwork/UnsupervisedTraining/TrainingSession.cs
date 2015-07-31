@@ -29,33 +29,51 @@ namespace UnsupervisedTraining
             Array values = Enum.GetValues(typeof(MoveDirection));
 
                 Game g = new Game(10, 10, 300);
+                //while (!_game.IsGameWon() && !_game.IsGameLost())
+                //{
+                //    MoveDirection dirToMove = MoveDirection.DOWN;
+                    
+                //    double[] inputs = new double[4];
+                //    int dir = 0;
+                //    MoveDirection[] directions = new MoveDirection[4];
+                //    foreach (MoveDirection val in values)
+                //    {
+                //        double distance = _game.GetDistanceToClosestDot(val, _game.CurrentCoord, new List<Tuple<int, int>>());
+                //        inputs[dir] = distance;
+                //        directions[dir] = val;
+                //        dir++;
+                //    }
+                //    _nn.setInputs(inputs);
+                //    _nn.calculate();
+                //    double[] probabilities = _nn.GetOutput();
+                //    double highestProb = double.MinValue;
+                //    for (int i = 0; i < probabilities.Length; i++)
+                //    {
+                //        if (probabilities[i] > highestProb)
+                //        {
+                //            dirToMove = directions[i];
+                //            highestProb = probabilities[i];
+                //        }
+                //    }
+                        
+                //    _game.UseTurn(dirToMove);
+                //}
                 while (!_game.IsGameWon() && !_game.IsGameLost())
                 {
                     MoveDirection dirToMove = MoveDirection.DOWN;
-                    
-                    double[] inputs = new double[4];
-                    int dir = 0;
-                    MoveDirection[] directions = new MoveDirection[4];
+                    double highestProb = double.MinValue;
                     foreach (MoveDirection val in values)
                     {
                         double distance = _game.GetDistanceToClosestDot(val, _game.CurrentCoord, new List<Tuple<int, int>>());
-                        inputs[dir] = distance;
-                        directions[dir] = val;
-                        dir++;
-                    }
-                    _nn.setInputs(inputs);
-                    _nn.calculate();
-                    double[] probabilities = _nn.GetOutput();
-                    double highestProb = double.MinValue;
-                    for (int i = 0; i < probabilities.Length; i++)
-                    {
-                        if (probabilities[i] > highestProb)
+                        _nn.setInputs(new[] { distance });
+                        _nn.calculate();
+                        double probability = _nn.GetOutput()[0];
+                        if (probability > highestProb)
                         {
-                            dirToMove = directions[i];
-                            highestProb = probabilities[i];
+                            dirToMove = val;
+                            highestProb = probability;
                         }
                     }
-                        
                     _game.UseTurn(dirToMove);
                 }
                 LoggerFactory.GetLogger().Log(LogLevel.Debug, string.Format("Stopping training session {0}", _sessionNumber));
