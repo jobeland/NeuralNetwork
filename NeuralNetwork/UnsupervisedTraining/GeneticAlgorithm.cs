@@ -1,4 +1,5 @@
 ﻿using ArtificialNeuralNetwork;
+using ArtificialNeuralNetwork.ActivationFunctions;
 using BasicGame;
 using Logging;
 using System;
@@ -20,12 +21,14 @@ namespace UnsupervisedTraining
         public NeuralNetwork[] NetsForGeneration { get; set; }
         public EvalWorkingSet History { get; set; }
         public IList<TrainingSession> _sessions { get; set; }
+        private readonly IActivationFunction _activationFunction;
         public bool SavedAtleastOne = false;
         public static double MUTATE_CHANCE = 0.05;
         private object ObjectLock;
 
+
         private static int INPUT_NEURONS = 4;
-        private static int HIDDEN_NEURONS = 7;
+        private static int HIDDEN_NEURONS = 3;
         private static int OUTPUT_NEURONS = 4;
         private static bool USE_MULTITHREADING = true;
 
@@ -36,12 +39,13 @@ namespace UnsupervisedTraining
         {
             this.Population = pop;
             Evals = new double[pop];
+            _activationFunction = new SinhActivationFunction();
             NetsForGeneration = new NeuralNetwork[pop];
             _sessions = new List<TrainingSession>();
             for (int i = 0; i < pop; i++)
             {
                 Evals[i] = -1;
-                NetsForGeneration[i] = new NeuralNetwork(INPUT_NEURONS, HIDDEN_NEURONS, OUTPUT_NEURONS);//TODO: why is this a hardcoded value?
+                NetsForGeneration[i] = new NeuralNetwork(INPUT_NEURONS, HIDDEN_NEURONS, OUTPUT_NEURONS, _activationFunction);//TODO: why is this a hardcoded value?
             }
             History = new EvalWorkingSet(50);//TODO: why is this a hardcoded value?
             ObjectLock = new object();
@@ -271,7 +275,7 @@ namespace UnsupervisedTraining
             List<NeuralNetwork> newNets = new List<NeuralNetwork>();
             for (int i = 0; i < numToGen; i++)
             {
-                NeuralNetwork newNet = new NeuralNetwork(INPUT_NEURONS, HIDDEN_NEURONS, OUTPUT_NEURONS);
+                NeuralNetwork newNet = new NeuralNetwork(INPUT_NEURONS, HIDDEN_NEURONS, OUTPUT_NEURONS, _activationFunction);
                 newNets.Add(newNet);
             }
             return newNets;
@@ -333,7 +337,7 @@ namespace UnsupervisedTraining
                     childGenes.Add(childLayer);
                 }
 
-                NeuralNetwork child = new NeuralNetwork(INPUT_NEURONS, HIDDEN_NEURONS, OUTPUT_NEURONS);
+                NeuralNetwork child = new NeuralNetwork(INPUT_NEURONS, HIDDEN_NEURONS, OUTPUT_NEURONS, _activationFunction);
                 child.setWeightMatrix(childGenes);
                 mutated.Add(child);
                 numMutated++;
@@ -428,7 +432,7 @@ namespace UnsupervisedTraining
                 }
                 childGenes.Add(childLayer);
             }
-            NeuralNetwork child = new NeuralNetwork(INPUT_NEURONS, HIDDEN_NEURONS, OUTPUT_NEURONS);
+            NeuralNetwork child = new NeuralNetwork(INPUT_NEURONS, HIDDEN_NEURONS, OUTPUT_NEURONS, _activationFunction);
             child.setWeightMatrix(childGenes);
             return child;
         }

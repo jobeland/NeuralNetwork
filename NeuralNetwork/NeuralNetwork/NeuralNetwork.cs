@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ArtificialNeuralNetwork.ActivationFunctions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,13 +16,13 @@ namespace ArtificialNeuralNetwork
         private Layer HiddenLayer;
         private Layer OutputLayer;
 
-        public NeuralNetwork(int numInput, int numHidden, int numOutput)
+        public NeuralNetwork(int numInput, int numHidden, int numOutput, IActivationFunction activationFunction)
         {
             InputLayer = new InputLayer(numInput);
             List<Neuron> inputNeurons = InputLayer.NeuronsInLayer;
-            HiddenLayer = new Layer(numHidden, inputNeurons);
+            HiddenLayer = new Layer(numHidden, inputNeurons, activationFunction);
             List<ActiveNeuron> hiddenNeurons = HiddenLayer.NeuronsInLayer;
-            OutputLayer = new Layer(numOutput, hiddenNeurons, 0);
+            OutputLayer = new Layer(numOutput, hiddenNeurons, 0, activationFunction);
         }
 
 

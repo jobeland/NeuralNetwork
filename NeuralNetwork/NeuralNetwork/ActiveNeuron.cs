@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ArtificialNeuralNetwork.ActivationFunctions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,22 +14,25 @@ public class ActiveNeuron : Neuron{
 	public Double[] Weights {get; set;}  
 	public List<Neuron> ConnectionsIn {get; set;}
 	public double Bias  {get; set;}
+    private readonly IActivationFunction _activationFunction;
 	
 
 	
-	public ActiveNeuron(List<Neuron> neuronsIn) {
+	public ActiveNeuron(List<Neuron> neuronsIn, IActivationFunction activationFunction) {
 		ConnectionsIn = neuronsIn;
 		Weights = new Double[ConnectionsIn.Count];
 		initializeWeights();
 		Bias = 0;
+        _activationFunction = activationFunction;
 	}
 	
-	public ActiveNeuron(List<ActiveNeuron> neuronsIn, int bias) {
+	public ActiveNeuron(List<ActiveNeuron> neuronsIn, int bias, IActivationFunction activationFunction) {
 		ConnectionsIn = new List<Neuron>();
         ConnectionsIn.AddRange(neuronsIn);
 		Weights = new Double[ConnectionsIn.Count];
 		initializeWeights();
 		bias = 0;
+        _activationFunction = activationFunction;
 	}
 	
 	public void initBias(){
@@ -68,7 +72,7 @@ public class ActiveNeuron : Neuron{
 //		}else{
 //			return 0.0;
 //		}
-		return Math.Tanh(resultOfSummation);
+		return _activationFunction.Calculate(resultOfSummation);
 	}
 	
 	public override double CalculateActivationFunction(){

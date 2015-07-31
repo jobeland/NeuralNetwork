@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ArtificialNeuralNetwork.ActivationFunctions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,23 +14,23 @@ namespace ArtificialNeuralNetwork
 
         public List<ActiveNeuron> NeuronsInLayer { get; set; }
 
-        public Layer(int numberOfNeuronsInLayer, List<Neuron> connectionsIn)
+        public Layer(int numberOfNeuronsInLayer, List<Neuron> connectionsIn, IActivationFunction activationFunction)
         {
             NeuronsInLayer = new List<ActiveNeuron>();
             for (int i = 0; i < numberOfNeuronsInLayer; i++)
             {
-                ActiveNeuron n = new ActiveNeuron(connectionsIn);
+                ActiveNeuron n = new ActiveNeuron(connectionsIn, activationFunction);
                 n.initBias();
                 NeuronsInLayer.Add(n);
             }
         }
 
-        public Layer(int numberOfNeuronsInLayer, List<ActiveNeuron> connectionsIn, int bias)
+        public Layer(int numberOfNeuronsInLayer, List<ActiveNeuron> connectionsIn, int bias, IActivationFunction activationFunction)
         {
             NeuronsInLayer = new List<ActiveNeuron>();
             for (int i = 0; i < numberOfNeuronsInLayer; i++)
             {
-                ActiveNeuron n = new ActiveNeuron(connectionsIn, bias);
+                ActiveNeuron n = new ActiveNeuron(connectionsIn, bias, activationFunction);
                 n.initBias();
                 NeuronsInLayer.Add(n);
             }

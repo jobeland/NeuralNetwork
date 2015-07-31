@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ArtificialNeuralNetwork.ActivationFunctions
 {
-    class SinhActivationFunction: IActivationFunction
+    public class SinhActivationFunction: IActivationFunction
     {
         public double Calculate(double sumOfInputsAndBias)
         {
