@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ArtificialNeuralNetwork.ActivationFunctions
 {
-    public interface ActivationFunction
+    public interface IActivationFunction
     {
         double Calculate(double sumOfInputsAndBias);
     }

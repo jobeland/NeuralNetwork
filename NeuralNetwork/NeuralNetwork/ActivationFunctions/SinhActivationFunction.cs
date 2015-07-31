@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace ArtificialNeuralNetwork.ActivationFunctions
 {
-    public class TanhActivationFunction : IActivationFunction
+    class SinhActivationFunction: IActivationFunction
     {
         public double Calculate(double sumOfInputsAndBias)
         {
-            return Math.Tanh(sumOfInputsAndBias);
+            return Math.Sinh(sumOfInputsAndBias);
         }
     }
 }
