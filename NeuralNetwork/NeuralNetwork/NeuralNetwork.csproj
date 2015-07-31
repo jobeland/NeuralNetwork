@@ -40,6 +40,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActivationFunctions\ActivationFunction.cs" />
+    <Compile Include="ActivationFunctions\TanhActivationFunction.cs" />
     <Compile Include="ActiveNeuron.cs" />
     <Compile Include="InputLayer.cs" />
     <Compile Include="Layer.cs" />

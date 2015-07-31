@@ -24,9 +24,10 @@ namespace UnsupervisedTraining
         public static double MUTATE_CHANCE = 0.05;
         private object ObjectLock;
 
-        private static int INPUT_NEURONS = 1;
-        private static int HIDDEN_NEURONS = 4;
-        private static int OUTPUT_NEURONS = 1;
+        private static int INPUT_NEURONS = 4;
+        private static int HIDDEN_NEURONS = 7;
+        private static int OUTPUT_NEURONS = 4;
+        private static bool USE_MULTITHREADING = true;
 
         private static double HIGH_MUTATION = 0.5;
         private static double NORMAL_MUTATION = 0.05;
@@ -54,10 +55,20 @@ namespace UnsupervisedTraining
                 _sessions.Add(new TrainingSession(NetsForGeneration[i], new Game(10, 10, 300), i));
                 
             }
-            Parallel.ForEach<TrainingSession>(_sessions, session =>
+            if (USE_MULTITHREADING)
+            {
+                Parallel.ForEach<TrainingSession>(_sessions, session =>
+                    {
+                        session.Run();
+                    });
+            }
+            else
+            {
+                foreach (var session in _sessions)
                 {
                     session.Run();
-                });
+                }
+            }            
         }
 
         public void GetEvalsForGeneration()
@@ -425,6 +436,11 @@ namespace UnsupervisedTraining
         private WeightedIndex chooseIndex(List<WeightedIndex> indices)
         {
             double value = RandomGenerator.GetInstance().NextDouble() * indices[indices.Count - 1].CumlativeWeight;
+            //Failsafe for odd case when value is very low. Needs a more permanent fix so as not to skew the selection towards lower, however slight           
+            if (indices[0].CumlativeWeight > value)
+            {
+                return indices[0];
+            }
             return indices.Last(index => index.CumlativeWeight <= value);
         }
 

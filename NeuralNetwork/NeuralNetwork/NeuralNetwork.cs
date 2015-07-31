@@ -38,10 +38,13 @@ namespace ArtificialNeuralNetwork
             OutputLayer.FireAll();
         }
 
-        public double GetOutput()
+        public double[] GetOutput()
         {
-            //return getIndexOfGreatestOutputNeuron();
-            return OutputLayer.NeuronsInLayer[0].Output;
+            double[] outputs = new double[OutputLayer.NeuronsInLayer.Count];
+            for(var i = 0; i < OutputLayer.NeuronsInLayer.Count; i++){
+                outputs[i] = OutputLayer.NeuronsInLayer[i].Output;
+            }
+            return outputs;
         }
 
         /**

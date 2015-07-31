@@ -11,7 +11,7 @@ namespace Trainer
     {
         static void Main(string[] args)
         {
-            GeneticAlgorithm evolver = new GeneticAlgorithm(500);
+            GeneticAlgorithm evolver = new GeneticAlgorithm(1000);
             evolver.runEpoch();
         }
     }

@@ -32,19 +32,30 @@ namespace UnsupervisedTraining
                 while (!_game.IsGameWon() && !_game.IsGameLost())
                 {
                     MoveDirection dirToMove = MoveDirection.DOWN;
-                    double highestProb = double.MinValue;
+                    
+                    double[] inputs = new double[4];
+                    int dir = 0;
+                    MoveDirection[] directions = new MoveDirection[4];
                     foreach (MoveDirection val in values)
                     {
                         double distance = _game.GetDistanceToClosestDot(val, _game.CurrentCoord, new List<Tuple<int, int>>());
-                        _nn.setInputs(new[] { distance });
-                        _nn.calculate();
-                        double probability = _nn.GetOutput();
-                        if (probability > highestProb)
+                        inputs[dir] = distance;
+                        directions[dir] = val;
+                        dir++;
+                    }
+                    _nn.setInputs(inputs);
+                    _nn.calculate();
+                    double[] probabilities = _nn.GetOutput();
+                    double highestProb = double.MinValue;
+                    for (int i = 0; i < probabilities.Length; i++)
+                    {
+                        if (probabilities[i] > highestProb)
                         {
-                            dirToMove = val;
-                            highestProb = probability;
+                            dirToMove = directions[i];
+                            highestProb = probabilities[i];
                         }
                     }
+                        
                     _game.UseTurn(dirToMove);
                 }
                 LoggerFactory.GetLogger().Log(LogLevel.Debug, string.Format("Stopping training session {0}", _sessionNumber));
