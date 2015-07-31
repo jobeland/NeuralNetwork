@@ -43,6 +43,7 @@
     <Compile Include="ActivationFunctions\AbsoluteXActivationFunction.cs" />
     <Compile Include="ActivationFunctions\IActivationFunction.cs" />
     <Compile Include="ActivationFunctions\IdentityActivationFunction.cs" />
+    <Compile Include="ActivationFunctions\InverseActivationFunction.cs" />
     <Compile Include="ActivationFunctions\SechActivationFunction.cs" />
     <Compile Include="ActivationFunctions\SinhActivationFunction.cs" />
     <Compile Include="ActivationFunctions\StepActivationFunction.cs" />
