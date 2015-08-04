@@ -8,9 +8,9 @@ namespace ArtificialNeuralNetwork.ActivationFunctions
 {
     public class IdentityActivationFunction : IActivationFunction
     {
-        public double Calculate(double sumOfInputsAndBias)
+        public double CalculateActivation(double signal)
         {
-            return sumOfInputsAndBias;
+            return signal;
         }
     }
 }

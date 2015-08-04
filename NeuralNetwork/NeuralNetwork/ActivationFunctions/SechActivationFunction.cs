@@ -8,9 +8,9 @@ namespace ArtificialNeuralNetwork.ActivationFunctions
 {
     public class SechActivationFunction : IActivationFunction
     {
-        public double Calculate(double sumOfInputsAndBias)
+        public double CalculateActivation(double signal)
         {
-            return (1 / Math.Cosh(sumOfInputsAndBias));
+            return (1 / Math.Cosh(signal));
         }
     }
 }

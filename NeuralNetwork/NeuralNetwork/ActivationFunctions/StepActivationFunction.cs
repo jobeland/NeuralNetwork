@@ -8,9 +8,9 @@ namespace ArtificialNeuralNetwork.ActivationFunctions
 {
     public class StepActivationFunction : IActivationFunction
     {
-        public double Calculate(double sumOfInputsAndBias)
+        public double CalculateActivation(double signal)
         {
-            if (sumOfInputsAndBias >= 0)
+            if (signal >= 0)
             {
                 return 1.0;
             }

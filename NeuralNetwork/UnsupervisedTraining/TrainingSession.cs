@@ -44,7 +44,7 @@ namespace UnsupervisedTraining
                 //        dir++;
                 //    }
                 //    _nn.setInputs(inputs);
-                //    _nn.calculate();
+                //    _nn.CalculateActivation();
                 //    double[] probabilities = _nn.GetOutput();
                 //    double highestProb = double.MinValue;
                 //    for (int i = 0; i < probabilities.Length; i++)
@@ -66,7 +66,7 @@ namespace UnsupervisedTraining
                     {
                         double distance = _game.GetDistanceToClosestDot(val, _game.CurrentCoord, new List<Tuple<int, int>>());
                         _nn.setInputs(new[] { distance });
-                        _nn.calculate();
+                        _nn.CalculateActivation();
                         double probability = _nn.GetOutput()[0];
                         if (probability > highestProb)
                         {

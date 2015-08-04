@@ -8,6 +8,6 @@ namespace ArtificialNeuralNetwork.ActivationFunctions
 {
     public interface IActivationFunction
     {
-        double Calculate(double sumOfInputsAndBias);
+        double CalculateActivation(double signal);
     }
 }

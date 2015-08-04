@@ -8,9 +8,9 @@ namespace ArtificialNeuralNetwork.ActivationFunctions
 {
     public class TanhActivationFunction : IActivationFunction
     {
-        public double Calculate(double sumOfInputsAndBias)
+        public double CalculateActivation(double signal)
         {
-            return Math.Tanh(sumOfInputsAndBias);
+            return Math.Tanh(signal);
         }
     }
 }

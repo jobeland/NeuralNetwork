@@ -7,27 +7,25 @@ using System.Threading.Tasks;
 namespace ArtificialNeuralNetwork
 {
     [Serializable]
-    public class Neuron
+    public class Neuron : INeuron
     {
+        private readonly ISoma _soma;
+        private readonly IAxon _axon;
 
-        public double Output { get; set; }
-        public double Input { get; set; }
-
-        public Neuron()
+        public Neuron(ISoma soma, IAxon axon)
         {
-            Output = 0;
-            Input = 0;
+            _soma = soma;
+            _axon = axon;
         }
 
         public virtual double CalculateActivationFunction()
         {
-            return Input;
+            return 0.0;
         }
 
-        public virtual void Fire()
+        public void ProcessInput()
         {
-            this.Output = CalculateActivationFunction();
-            this.Input = 0;
+            _axon.ProcessSignal(_soma.CalculateSummation());
         }
 
     }

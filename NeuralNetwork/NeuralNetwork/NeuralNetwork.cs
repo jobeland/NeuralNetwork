@@ -32,7 +32,7 @@ namespace ArtificialNeuralNetwork
             InputLayer.SetInputs(inputs);
         }
 
-        public void calculate()
+        public void CalculateActivation()
         {
             InputLayer.FireAll();
             HiddenLayer.FireAll();

@@ -9,7 +9,7 @@ namespace ArtificialNeuralNetwork
 {
     
 [Serializable]
-public class ActiveNeuron : Neuron{
+public class ActiveNeuron{
 	
 	public Double[] Weights {get; set;}  
 	public List<Neuron> ConnectionsIn {get; set;}
@@ -67,14 +67,14 @@ public class ActiveNeuron : Neuron{
 	
 	private double calculateThresholdActivationFunction(){
 		double resultOfSummation = sumInputsAndWeightsWithBias();
-		return _activationFunction.Calculate(resultOfSummation);
+		return _activationFunction.CalculateActivation(resultOfSummation);
 	}
 	
-	public override double CalculateActivationFunction(){
+	public double CalculateActivationFunction(){
 			return calculateThresholdActivationFunction();
 	}
 	
-	public override void Fire() {
+	public void Fire() {
 		this.Output = calculateThresholdActivationFunction();
 		this.Input = 0;
 	}

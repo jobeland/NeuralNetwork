@@ -8,9 +8,9 @@ namespace ArtificialNeuralNetwork.ActivationFunctions
 {
     public class SinhActivationFunction: IActivationFunction
     {
-        public double Calculate(double sumOfInputsAndBias)
+        public double CalculateActivation(double signal)
         {
-            return Math.Sinh(sumOfInputsAndBias);
+            return Math.Sinh(signal);
         }
     }
 }
