@@ -60,6 +60,7 @@
     <Compile Include="IWeightInitializer.cs" />
     <Compile Include="RandomWeightInitializer.cs" />
     <Compile Include="Soma.cs" />
+    <Compile Include="SummationFunctions\AverageSummation.cs" />
     <Compile Include="SummationFunctions\ISummationFunction.cs" />
     <Compile Include="SummationFunctions\MaxSummation.cs" />
     <Compile Include="SummationFunctions\MinSummation.cs" />
