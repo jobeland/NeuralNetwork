@@ -27,6 +27,27 @@ namespace ArtificialNeuralNetwork
         {
             _axon.ProcessSignal(_soma.CalculateSummation());
         }
-
+	
+    //public void initBias(){
+    //    double val = new Random().NextDouble();
+    //    if(new Random().NextDouble() < 0.5){
+    //        // 50% chance of being negative, being between -1 and 1
+    //        val = 0 - val;
+    //    }
+    //    Bias = val;
+    //}
+	
+    //private void initializeWeights(){
+    //    // weights assumed to always be between -1 and 1
+    //    for(int i = 0; i < Weights.Length; i++){
+    //        double val = new Random().NextDouble();
+    //        if(new Random().NextDouble() < 0.5){
+    //            // 50% chance of being negative, being between -1 and 1
+    //            val = 0 - val;
+    //        }
+    //        Weights[i] = val;
+    //    }
+    //}
+	
     }
 }

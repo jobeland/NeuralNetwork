@@ -54,6 +54,8 @@
     <Compile Include="IAxon.cs" />
     <Compile Include="INeuron.cs" />
     <Compile Include="ISoma.cs" />
+    <Compile Include="IWeightInitializer.cs" />
+    <Compile Include="RandomWeightInitializer.cs" />
     <Compile Include="Soma.cs" />
     <Compile Include="SummationFunctions\ISummationFunction.cs" />
     <Compile Include="Synapse.cs" />
