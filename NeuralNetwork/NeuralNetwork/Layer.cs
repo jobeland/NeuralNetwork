@@ -16,13 +16,6 @@ namespace ArtificialNeuralNetwork
         private Layer(IList<INeuron> neuronsInLayer)
         {
             _neuronsInLayer = neuronsInLayer;
-            //NeuronsInLayer = new List<ActiveNeuron>();
-            //for (int i = 0; i < numberOfNeuronsInLayer; i++)
-            //{
-            //    ActiveNeuron n = new ActiveNeuron(connectionsIn, activationFunction);
-            //    n.initBias();
-            //    NeuronsInLayer.Add(n);
-            //}
         }
 
         public static ILayer GetInstance(IList<INeuron> neuronsInLayer)
