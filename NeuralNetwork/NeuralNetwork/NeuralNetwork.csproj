@@ -62,6 +62,7 @@
     <Compile Include="Soma.cs" />
     <Compile Include="SummationFunctions\ISummationFunction.cs" />
     <Compile Include="SummationFunctions\MaxSummation.cs" />
+    <Compile Include="SummationFunctions\MinSummation.cs" />
     <Compile Include="Synapse.cs" />
     <Compile Include="InputLayer.cs" />
     <Compile Include="Layer.cs" />
