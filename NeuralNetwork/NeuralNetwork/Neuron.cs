@@ -12,15 +12,15 @@ namespace ArtificialNeuralNetwork
         private readonly ISoma _soma;
         private readonly IAxon _axon;
 
-        public Neuron(ISoma soma, IAxon axon)
+        private Neuron(ISoma soma, IAxon axon)
         {
             _soma = soma;
             _axon = axon;
         }
 
-        public virtual double CalculateActivationFunction()
+        public static INeuron Create(ISoma soma, IAxon axon)
         {
-            return 0.0;
+            return new Neuron(soma, axon);
         }
 
         public void Process()
