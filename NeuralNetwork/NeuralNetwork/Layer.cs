@@ -9,11 +9,11 @@ namespace ArtificialNeuralNetwork
 {
 
     [Serializable]
-    public class Layer
+    public class Layer : ILayer
     {
         private readonly IList<INeuron> _neuronsInLayer;
 
-        public Layer(IList<INeuron> neuronsInLayer)
+        private Layer(IList<INeuron> neuronsInLayer)
         {
             _neuronsInLayer = neuronsInLayer;
             //NeuronsInLayer = new List<ActiveNeuron>();
@@ -23,6 +23,11 @@ namespace ArtificialNeuralNetwork
             //    n.initBias();
             //    NeuronsInLayer.Add(n);
             //}
+        }
+
+        public static ILayer GetInstance(IList<INeuron> neuronsInLayer)
+        {
+            return new Layer(neuronsInLayer);
         }
 
         public void Process()

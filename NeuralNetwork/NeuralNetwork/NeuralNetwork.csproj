@@ -54,6 +54,7 @@
     <Compile Include="Factories\SomaFactory.cs" />
     <Compile Include="Factories\SynapseFactory.cs" />
     <Compile Include="IAxon.cs" />
+    <Compile Include="ILayer.cs" />
     <Compile Include="INeuron.cs" />
     <Compile Include="ISoma.cs" />
     <Compile Include="IWeightInitializer.cs" />
