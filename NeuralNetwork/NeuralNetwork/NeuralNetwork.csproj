@@ -61,6 +61,7 @@
     <Compile Include="RandomWeightInitializer.cs" />
     <Compile Include="Soma.cs" />
     <Compile Include="SummationFunctions\ISummationFunction.cs" />
+    <Compile Include="SummationFunctions\MaxSummation.cs" />
     <Compile Include="Synapse.cs" />
     <Compile Include="InputLayer.cs" />
     <Compile Include="Layer.cs" />
