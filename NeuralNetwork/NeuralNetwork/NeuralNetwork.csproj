@@ -49,7 +49,6 @@
     <Compile Include="ActivationFunctions\SinhActivationFunction.cs" />
     <Compile Include="ActivationFunctions\StepActivationFunction.cs" />
     <Compile Include="ActivationFunctions\TanhActivationFunction.cs" />
-    <Compile Include="ActiveNeuron.cs" />
     <Compile Include="Axon.cs" />
     <Compile Include="IAxon.cs" />
     <Compile Include="INeuron.cs" />
