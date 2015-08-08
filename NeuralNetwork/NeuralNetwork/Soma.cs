@@ -11,10 +11,15 @@ namespace ArtificialNeuralNetwork
         private readonly IList<Synapse> _dendrites;
         private readonly ISummationFunction _summationFunction;
 
-        public Soma(IList<Synapse> dendrites, ISummationFunction summationFunction)
+        private Soma(IList<Synapse> dendrites, ISummationFunction summationFunction)
         {
             _dendrites = dendrites;
             _summationFunction = summationFunction;
+        }
+
+        public static ISoma GetInstance(IList<Synapse> dendrites, ISummationFunction summationFunction)
+        {
+            return new Soma(dendrites, summationFunction);
         }
 
         public double CalculateSummation()

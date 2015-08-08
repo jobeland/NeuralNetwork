@@ -26,7 +26,7 @@ namespace ArtificialNeuralNetwork.Factories
             {
                 Value = 0.0,
                 Weight = _weightInitializer.InitializeWeight()
-            }
+            };
         }
     }
 }

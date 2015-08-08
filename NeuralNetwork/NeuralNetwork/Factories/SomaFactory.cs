@@ -22,7 +22,7 @@ namespace ArtificialNeuralNetwork.Factories
 
         public ISoma Create(IList<Synapse> dendrites)
         {
-            return new Soma(dendrites, _summationFunction);
+            return Soma.GetInstance(dendrites, _summationFunction);
         }
     }
 }
