@@ -12,10 +12,15 @@ namespace ArtificialNeuralNetwork
         private readonly IList<Synapse> _terminals;
         private readonly IActivationFunction _activationFunction;
 
-        public Axon(IList<Synapse> terminals, IActivationFunction activationFunction)
+        private Axon(IList<Synapse> terminals, IActivationFunction activationFunction)
         {
             _activationFunction = activationFunction;
             _terminals = terminals;
+        }
+
+        public static IAxon GetInstance(IList<Synapse> terminals, IActivationFunction activationFunction)
+        {
+            return new Axon(terminals, activationFunction);
         }
 
         public void ProcessSignal(double signal)

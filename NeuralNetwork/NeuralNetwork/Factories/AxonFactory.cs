@@ -23,7 +23,7 @@ namespace ArtificialNeuralNetwork.Factories
 
         public IAxon Create(IList<Synapse> terminals)
         {
-            return new Axon(terminals, _activationFunction);
+            return Axon.GetInstance(terminals, _activationFunction);
         }
     }
 }
