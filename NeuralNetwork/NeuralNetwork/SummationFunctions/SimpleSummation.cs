@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ArtificialNeuralNetwork
 {
-    public class SimpleSum : ISummationFunction
+    public class SimpleSummation : ISummationFunction
     {
         public double CalculateSummation(IList<Synapse> dendrites)
         {

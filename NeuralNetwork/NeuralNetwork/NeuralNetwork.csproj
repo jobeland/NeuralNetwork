@@ -68,7 +68,7 @@
     <Compile Include="NeuralNetwork.cs" />
     <Compile Include="Neuron.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SummationFunctions\SimpleSum.cs" />
+    <Compile Include="SummationFunctions\SimpleSummation.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
