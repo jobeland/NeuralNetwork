@@ -18,7 +18,7 @@ namespace ArtificialNeuralNetwork
             _axon = axon;
         }
 
-        public static INeuron Create(ISoma soma, IAxon axon)
+        public static INeuron GetInstance(ISoma soma, IAxon axon)
         {
             return new Neuron(soma, axon);
         }
