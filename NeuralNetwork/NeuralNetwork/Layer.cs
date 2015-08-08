@@ -25,11 +25,11 @@ namespace ArtificialNeuralNetwork
             //}
         }
 
-        public void ProcessLayer()
+        public void Process()
         {
             foreach (INeuron n in _neuronsInLayer)
             {
-                n.ProcessInput();
+                n.Process();
             }
         }
 

@@ -23,7 +23,7 @@ namespace ArtificialNeuralNetwork
             return 0.0;
         }
 
-        public void ProcessInput()
+        public void Process()
         {
             _axon.ProcessSignal(_soma.CalculateSummation());
         }

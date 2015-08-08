@@ -3,6 +3,6 @@ namespace ArtificialNeuralNetwork
 {
     public interface INeuron
     {
-        void ProcessInput();
+        void Process();
     }
 }

@@ -12,7 +12,7 @@ namespace ArtificialNeuralNetwork
     public class NeuralNetwork
     {
 
-        private InputLayer InputLayer;
+        private Layer InputLayer;
         private Layer HiddenLayer;
         private Layer OutputLayer;
 
