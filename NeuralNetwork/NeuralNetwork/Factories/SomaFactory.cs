@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ArtificialNeuralNetwork.Factories
 {
-    public class SomaFactory
+    public class SomaFactory : ISomaFactory
     {
         private ISummationFunction _summationFunction;
 

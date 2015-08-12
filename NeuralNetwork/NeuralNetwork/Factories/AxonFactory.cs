@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ArtificialNeuralNetwork.Factories
 {
-    public class AxonFactory
+    public class AxonFactory : IAxonFactory
     {
         private IActivationFunction _activationFunction;
 

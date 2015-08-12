@@ -51,6 +51,10 @@
     <Compile Include="ActivationFunctions\TanhActivationFunction.cs" />
     <Compile Include="Axon.cs" />
     <Compile Include="Factories\AxonFactory.cs" />
+    <Compile Include="Factories\IAxonFactory.cs" />
+    <Compile Include="Factories\ISomaFactory.cs" />
+    <Compile Include="Factories\ISynapseFactory.cs" />
+    <Compile Include="Factories\NeuralNetworkFactory.cs" />
     <Compile Include="Factories\SomaFactory.cs" />
     <Compile Include="Factories\SynapseFactory.cs" />
     <Compile Include="IAxon.cs" />

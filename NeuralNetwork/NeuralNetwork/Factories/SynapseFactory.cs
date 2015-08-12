@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ArtificialNeuralNetwork.Factories
 {
-    public class SynapseFactory
+    public class SynapseFactory : ISynapseFactory
     {
         private IWeightInitializer _weightInitializer;
 
