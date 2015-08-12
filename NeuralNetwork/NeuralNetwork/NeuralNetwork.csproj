@@ -66,7 +66,6 @@
     <Compile Include="SummationFunctions\MaxSummation.cs" />
     <Compile Include="SummationFunctions\MinSummation.cs" />
     <Compile Include="Synapse.cs" />
-    <Compile Include="InputLayer.cs" />
     <Compile Include="Layer.cs" />
     <Compile Include="NeuralNetwork.cs" />
     <Compile Include="Neuron.cs" />
