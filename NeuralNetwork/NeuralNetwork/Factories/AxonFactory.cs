@@ -16,7 +16,7 @@ namespace ArtificialNeuralNetwork.Factories
             _activationFunction = activationFunction;
         }
 
-        public static AxonFactory GetInstance(IActivationFunction activationFunction)
+        public static IAxonFactory GetInstance(IActivationFunction activationFunction)
         {
             return new AxonFactory(activationFunction);
         }

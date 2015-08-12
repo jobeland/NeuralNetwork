@@ -15,7 +15,7 @@ namespace ArtificialNeuralNetwork.Factories
             _weightInitializer = weightInitializer;
         }
 
-        public static SynapseFactory GetInstance(IWeightInitializer weightInitializer)
+        public static ISynapseFactory GetInstance(IWeightInitializer weightInitializer)
         {
             return new SynapseFactory(weightInitializer);
         }

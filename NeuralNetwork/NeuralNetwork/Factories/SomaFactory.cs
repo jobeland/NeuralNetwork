@@ -15,7 +15,7 @@ namespace ArtificialNeuralNetwork.Factories
             _summationFunction = summationFunction;
         }
 
-        public static SomaFactory GetInstance(ISummationFunction summationFunction)
+        public static ISomaFactory GetInstance(ISummationFunction summationFunction)
         {
             return new SomaFactory(summationFunction);
         }
