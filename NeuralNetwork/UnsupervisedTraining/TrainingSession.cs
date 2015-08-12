@@ -65,9 +65,9 @@ namespace UnsupervisedTraining
                     foreach (MoveDirection val in values)
                     {
                         double distance = _game.GetDistanceToClosestDot(val, _game.CurrentCoord, new List<Tuple<int, int>>());
-                        _nn.setInputs(new[] { distance });
-                        _nn.CalculateActivation();
-                        double probability = _nn.GetOutput()[0];
+                        _nn.SetInputs(new[] { distance });
+                        _nn.Process();
+                        double probability = _nn.GetOutputs()[0];
                         if (probability > highestProb)
                         {
                             dirToMove = val;

@@ -30,8 +30,6 @@ namespace ArtificialNeuralNetwork
                 n.Process();
             }
         }
-
-
     }
 
 }

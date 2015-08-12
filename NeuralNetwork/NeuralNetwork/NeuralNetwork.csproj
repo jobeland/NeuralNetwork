@@ -55,6 +55,7 @@
     <Compile Include="Factories\SynapseFactory.cs" />
     <Compile Include="IAxon.cs" />
     <Compile Include="ILayer.cs" />
+    <Compile Include="INeuralNetwork.cs" />
     <Compile Include="INeuron.cs" />
     <Compile Include="ISoma.cs" />
     <Compile Include="IWeightInitializer.cs" />

@@ -9,156 +9,171 @@ namespace ArtificialNeuralNetwork
 {
 
     [Serializable]
-    public class NeuralNetwork
+    public class NeuralNetwork : INeuralNetwork
     {
 
-        private Layer InputLayer;
-        private Layer HiddenLayer;
-        private Layer OutputLayer;
+        private ILayer _inputLayer;
+        private IList<ILayer> _hiddenLayers;
+        private ILayer _outputLayer;
+        private IList<Synapse> _inputs;
+        private IList<Synapse> _outputs;
 
-        public NeuralNetwork(int numInput, int numHidden, int numOutput, IActivationFunction activationFunction)
+        private NeuralNetwork(IList<Synapse> inputs, ILayer inputLayer, IList<ILayer> hiddenLayers, ILayer outputLayer, IList<Synapse> outputs)
         {
-            InputLayer = new InputLayer(numInput);
-            List<Neuron> inputNeurons = InputLayer.NeuronsInLayer;
-            HiddenLayer = new Layer(numHidden, inputNeurons, activationFunction);
-            List<ActiveNeuron> hiddenNeurons = HiddenLayer.NeuronsInLayer;
-            OutputLayer = new Layer(numOutput, hiddenNeurons, 0, activationFunction);
+            _inputs = inputs;
+            _inputLayer = inputLayer;
+            _hiddenLayers = hiddenLayers;
+            _outputLayer = outputLayer;
+            _outputs = outputs;
         }
 
-
-
-        public void setInputs(double[] inputs)
+        public static INeuralNetwork GetInstance(IList<Synapse> inputs, ILayer inputLayer, IList<ILayer> hiddenLayers, ILayer outputLayer, IList<Synapse> outputs)
         {
-            InputLayer.SetInputs(inputs);
+            return new NeuralNetwork(inputs, inputLayer, hiddenLayers, outputLayer, outputs);
         }
 
-        public void CalculateActivation()
+        public void SetInputs(double[] inputs)
         {
-            InputLayer.FireAll();
-            HiddenLayer.FireAll();
-            OutputLayer.FireAll();
+            if (inputs.Length != _inputs.Count)
+            {
+                throw new ArgumentException(string.Format("inputs of length: {0} does not match the number of input synapses: {1}", inputs.Length, _inputs.Count));
+            }
+            for (int i = 0; i < _inputs.Count; i++)
+            {
+                _inputs[i].Value = inputs[i];
+            }
         }
 
-        public double[] GetOutput()
+        public void Process()
         {
-            double[] outputs = new double[OutputLayer.NeuronsInLayer.Count];
-            for(var i = 0; i < OutputLayer.NeuronsInLayer.Count; i++){
-                outputs[i] = OutputLayer.NeuronsInLayer[i].Output;
+            _inputLayer.Process();
+            foreach (ILayer hiddenLayer in _hiddenLayers)
+            {
+                hiddenLayer.Process();
+            }
+            _outputLayer.Process();
+        }
+
+        public double[] GetOutputs()
+        {
+            double[] outputs = new double[_outputs.Count];
+            for(var i = 0; i < _outputs.Count; i++){
+                outputs[i] = _outputs[i].Value;
             }
             return outputs;
         }
 
-        /**
-         * First index is the list of all of the weight arrays for the hidden layer,
-         * second index is the List of all of the weight arrays for the output layer
-         * @return
-         */
-        public List<List<Double[]>> getWeightMatrix()
-        {
-            List<Double[]> hiddenWeights = new List<Double[]>();
-            foreach (Neuron n in HiddenLayer.NeuronsInLayer)
-            {
-                if (n.GetType() == typeof(ActiveNeuron))
-                {
-                    ActiveNeuron neuron = (ActiveNeuron)n;
-                    hiddenWeights.Add(neuron.Weights);
-                }
-            }
-            List<Double[]> outputWeights = new List<Double[]>();
-            foreach (Neuron n in OutputLayer.NeuronsInLayer)
-            {
-                if (n.GetType() == typeof(ActiveNeuron))
-                {
-                    ActiveNeuron neuron = (ActiveNeuron)n;
-                    outputWeights.Add(neuron.Weights);
-                }
-            }
+        ///**
+        // * First index is the list of all of the weight arrays for the hidden layer,
+        // * second index is the List of all of the weight arrays for the output layer
+        // * @return
+        // */
+        //public List<List<Double[]>> getWeightMatrix()
+        //{
+        //    List<Double[]> hiddenWeights = new List<Double[]>();
+        //    foreach (Neuron n in HiddenLayer.NeuronsInLayer)
+        //    {
+        //        if (n.GetType() == typeof(ActiveNeuron))
+        //        {
+        //            ActiveNeuron neuron = (ActiveNeuron)n;
+        //            hiddenWeights.Add(neuron.Weights);
+        //        }
+        //    }
+        //    List<Double[]> outputWeights = new List<Double[]>();
+        //    foreach (Neuron n in OutputLayer.NeuronsInLayer)
+        //    {
+        //        if (n.GetType() == typeof(ActiveNeuron))
+        //        {
+        //            ActiveNeuron neuron = (ActiveNeuron)n;
+        //            outputWeights.Add(neuron.Weights);
+        //        }
+        //    }
 
-            List<Double[]> biases = new List<Double[]>();
-            int sizeHiddenBias = HiddenLayer.NeuronsInLayer.Count;
-            Double[] hiddenBias = new Double[sizeHiddenBias];
-            int i = 0;
-            foreach (Neuron n in HiddenLayer.NeuronsInLayer)
-            {
-                if (n.GetType() == typeof(ActiveNeuron))
-                {
-                    ActiveNeuron neuron = (ActiveNeuron)n;
-                    hiddenBias[i++] = neuron.Bias;
-                }
-            }
-            biases.Add(hiddenBias);
+        //    List<Double[]> biases = new List<Double[]>();
+        //    int sizeHiddenBias = HiddenLayer.NeuronsInLayer.Count;
+        //    Double[] hiddenBias = new Double[sizeHiddenBias];
+        //    int i = 0;
+        //    foreach (Neuron n in HiddenLayer.NeuronsInLayer)
+        //    {
+        //        if (n.GetType() == typeof(ActiveNeuron))
+        //        {
+        //            ActiveNeuron neuron = (ActiveNeuron)n;
+        //            hiddenBias[i++] = neuron.Bias;
+        //        }
+        //    }
+        //    biases.Add(hiddenBias);
 
 
-            int sizeoutBias = OutputLayer.NeuronsInLayer.Count;
-            Double[] outBias = new Double[sizeoutBias];
-            i = 0;
-            foreach (Neuron n in OutputLayer.NeuronsInLayer)
-            {
-                if (n.GetType() == typeof(ActiveNeuron))
-                {
-                    ActiveNeuron neuron = (ActiveNeuron)n;
-                    outBias[i++] = neuron.Bias;
-                }
-            }
-            biases.Add(outBias);
+        //    int sizeoutBias = OutputLayer.NeuronsInLayer.Count;
+        //    Double[] outBias = new Double[sizeoutBias];
+        //    i = 0;
+        //    foreach (Neuron n in OutputLayer.NeuronsInLayer)
+        //    {
+        //        if (n.GetType() == typeof(ActiveNeuron))
+        //        {
+        //            ActiveNeuron neuron = (ActiveNeuron)n;
+        //            outBias[i++] = neuron.Bias;
+        //        }
+        //    }
+        //    biases.Add(outBias);
 
-            List<List<Double[]>> weightsToReturn = new List<List<Double[]>>();
-            weightsToReturn.Add(hiddenWeights);
-            weightsToReturn.Add(outputWeights);
-            weightsToReturn.Add(biases);
-            return weightsToReturn;
+        //    List<List<Double[]>> weightsToReturn = new List<List<Double[]>>();
+        //    weightsToReturn.Add(hiddenWeights);
+        //    weightsToReturn.Add(outputWeights);
+        //    weightsToReturn.Add(biases);
+        //    return weightsToReturn;
 
-        }
+        //}
 
-        /**
-         * First index is the list of all of the weight arrays for the hidden layer,
-         * second index is the List of all of the weight arrays for the output layer
-         * @return
-         */
-        public void setWeightMatrix(List<List<Double[]>> matrix)
-        {
-            List<Double[]> hiddenWeights = matrix[0];
-            List<Double[]> outputWeights = matrix[1];
-            List<Double[]> biases = matrix[2];
+        ///**
+        // * First index is the list of all of the weight arrays for the hidden layer,
+        // * second index is the List of all of the weight arrays for the output layer
+        // * @return
+        // */
+        //public void setWeightMatrix(List<List<Double[]>> matrix)
+        //{
+        //    List<Double[]> hiddenWeights = matrix[0];
+        //    List<Double[]> outputWeights = matrix[1];
+        //    List<Double[]> biases = matrix[2];
 
-            int index = 0;
-            foreach (Neuron n in HiddenLayer.NeuronsInLayer)
-            {
-                if (n.GetType() == typeof(ActiveNeuron))
-                {
-                    ActiveNeuron neuron = (ActiveNeuron)n;
-                    neuron.Weights = hiddenWeights[index];
-                    neuron.Bias = biases[0][index];
-                    index++;
-                }
-            }
-            index = 0;
-            foreach (Neuron n in OutputLayer.NeuronsInLayer)
-            {
-                if (n.GetType() == typeof(ActiveNeuron))
-                {
-                    ActiveNeuron neuron = (ActiveNeuron)n;
-                    neuron.Weights = outputWeights[index];
-                    neuron.Bias = biases[1][index];
-                    index++;
-                }
-            }
-        }
+        //    int index = 0;
+        //    foreach (Neuron n in HiddenLayer.NeuronsInLayer)
+        //    {
+        //        if (n.GetType() == typeof(ActiveNeuron))
+        //        {
+        //            ActiveNeuron neuron = (ActiveNeuron)n;
+        //            neuron.Weights = hiddenWeights[index];
+        //            neuron.Bias = biases[0][index];
+        //            index++;
+        //        }
+        //    }
+        //    index = 0;
+        //    foreach (Neuron n in OutputLayer.NeuronsInLayer)
+        //    {
+        //        if (n.GetType() == typeof(ActiveNeuron))
+        //        {
+        //            ActiveNeuron neuron = (ActiveNeuron)n;
+        //            neuron.Weights = outputWeights[index];
+        //            neuron.Bias = biases[1][index];
+        //            index++;
+        //        }
+        //    }
+        //}
 
-        private int getIndexOfGreatestOutputNeuron()
-        {
-            List<ActiveNeuron> neurons = OutputLayer.NeuronsInLayer;
-            double maxOutput = Double.MinValue;
-            int indexOfMax = 0;
-            for (int i = 0; i < neurons.Count; i++)
-            {
-                if (neurons[i].Output > maxOutput)
-                {
-                    maxOutput = neurons[i].Output;
-                    indexOfMax = i;
-                }
-            }
-            return indexOfMax;
-        }
+        //private int getIndexOfGreatestOutputNeuron()
+        //{
+        //    List<ActiveNeuron> neurons = OutputLayer.NeuronsInLayer;
+        //    double maxOutput = Double.MinValue;
+        //    int indexOfMax = 0;
+        //    for (int i = 0; i < neurons.Count; i++)
+        //    {
+        //        if (neurons[i].Output > maxOutput)
+        //        {
+        //            maxOutput = neurons[i].Output;
+        //            indexOfMax = i;
+        //        }
+        //    }
+        //    return indexOfMax;
+        //}
     }
 }
