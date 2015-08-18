@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ArtificialNeuralNetwork.Factories
 {
-    public class NeuralNetworkFactory
+    public class NeuralNetworkFactory : INeuralNetworkFactory
     {
         //TODO: this class needs to create and setup the entire network
          private ISummationFunction _summationFunction;
@@ -141,6 +141,12 @@ namespace ArtificialNeuralNetwork.Factories
             }
 
             return dendrites;
+        }
+
+
+        public INeuralNetwork Create(Genes.NeuralNetworkGene genes)
+        {
+            throw new NotImplementedException();
         }
     }
 }
