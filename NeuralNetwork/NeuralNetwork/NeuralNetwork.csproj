@@ -48,7 +48,6 @@
     <Compile Include="ActivationFunctions\SigmoidActivationFunction.cs" />
     <Compile Include="ActivationFunctions\SinhActivationFunction.cs" />
     <Compile Include="ActivationFunctions\StepActivationFunction.cs" />
-    <Compile Include="ActivationFunctions\SupportedActivationFunctions.cs" />
     <Compile Include="ActivationFunctions\TanhActivationFunction.cs" />
     <Compile Include="Axon.cs" />
     <Compile Include="Factories\AxonFactory.cs" />
@@ -75,7 +74,6 @@
     <Compile Include="SummationFunctions\ISummationFunction.cs" />
     <Compile Include="SummationFunctions\MaxSummation.cs" />
     <Compile Include="SummationFunctions\MinSummation.cs" />
-    <Compile Include="SummationFunctions\SupportedSummationFunctions.cs" />
     <Compile Include="Synapse.cs" />
     <Compile Include="Layer.cs" />
     <Compile Include="NeuralNetwork.cs" />

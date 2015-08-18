@@ -9,6 +9,6 @@ namespace ArtificialNeuralNetwork.Genes
 {
     public class AxonGene
     {
-        public SupportedActivationFunctions ActivationFunction;
+        public Type ActivationFunction;
     }
 }

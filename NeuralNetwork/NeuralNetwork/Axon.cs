@@ -1,4 +1,5 @@
 ﻿using ArtificialNeuralNetwork.ActivationFunctions;
+using ArtificialNeuralNetwork.Genes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,5 +41,14 @@ namespace ArtificialNeuralNetwork
                 synapse.Value = outputSignal;
             }
         }
+
+        public AxonGene GetGenes()
+        {
+            return new AxonGene
+            {
+                ActivationFunction = _activationFunction.GetType()
+            };
+        }
+
     }
 }

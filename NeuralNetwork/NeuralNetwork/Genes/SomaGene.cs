@@ -11,6 +11,6 @@ namespace ArtificialNeuralNetwork.Genes
     {
         public IList<double> Weights;
         public double Bias;
-        public SupportedSummationFunctions SummationFunction;
+        public Type SummationFunction;
     }
 }
