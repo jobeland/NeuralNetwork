@@ -8,9 +8,9 @@ namespace ArtificialNeuralNetwork
 {
     public class SimpleSummation : ISummationFunction
     {
-        public double CalculateSummation(IList<Synapse> dendrites)
+        public double CalculateSummation(IList<Synapse> dendrites, double bias)
         {
-            double sum = 0.0;
+            double sum = bias;
             foreach (Synapse synapse in dendrites)
             {
                 sum += synapse.Value * synapse.Weight;

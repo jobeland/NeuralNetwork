@@ -8,12 +8,12 @@ namespace ArtificialNeuralNetwork.SummationFunctions
 {
     public class AverageSummation : ISummationFunction
     {
-        public double CalculateSummation(IList<Synapse> dendrites)
+        public double CalculateSummation(IList<Synapse> dendrites, double bias)
         {
-            double average = 0.0;
+            double average = bias;
             if(dendrites.Count == 0)
             {
-                return 0.0;
+                return average;
             }
             foreach (Synapse synapse in dendrites)
             {

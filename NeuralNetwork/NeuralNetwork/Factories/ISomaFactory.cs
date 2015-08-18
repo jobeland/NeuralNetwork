@@ -4,6 +4,6 @@ namespace ArtificialNeuralNetwork.Factories
 {
     public interface ISomaFactory
     {
-        ISoma Create(IList<Synapse> dendrites);
+        ISoma Create(IList<Synapse> dendrites, double bias);
     }
 }

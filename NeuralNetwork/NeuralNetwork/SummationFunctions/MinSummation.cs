@@ -8,9 +8,9 @@ namespace ArtificialNeuralNetwork.SummationFunctions
 {
     public class MinSummation : ISummationFunction
     {
-        public double CalculateSummation(IList<Synapse> dendrites)
+        public double CalculateSummation(IList<Synapse> dendrites, double bias)
         {
-            double min = double.MaxValue;
+            double min = bias;
             foreach (Synapse synapse in dendrites)
             {
                 if (synapse.Value < min)

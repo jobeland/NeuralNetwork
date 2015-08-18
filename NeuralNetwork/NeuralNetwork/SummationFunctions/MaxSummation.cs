@@ -8,9 +8,9 @@ namespace ArtificialNeuralNetwork.SummationFunctions
 {
     public class MaxSummation : ISummationFunction
     {
-        public double CalculateSummation(IList<Synapse> dendrites)
+        public double CalculateSummation(IList<Synapse> dendrites, double bias)
         {
-            double max = double.MinValue;
+            double max = bias;
             foreach (Synapse synapse in dendrites)
             {
                 if (synapse.Value > max)

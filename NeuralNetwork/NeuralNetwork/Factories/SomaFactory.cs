@@ -20,9 +20,9 @@ namespace ArtificialNeuralNetwork.Factories
             return new SomaFactory(summationFunction);
         }
 
-        public ISoma Create(IList<Synapse> dendrites)
+        public ISoma Create(IList<Synapse> dendrites, double bias)
         {
-            return Soma.GetInstance(dendrites, _summationFunction);
+            return Soma.GetInstance(dendrites, _summationFunction, bias);
         }
     }
 }

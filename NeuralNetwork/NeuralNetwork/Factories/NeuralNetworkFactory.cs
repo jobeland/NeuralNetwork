@@ -49,7 +49,7 @@ namespace ArtificialNeuralNetwork.Factories
                 var dendrites = new[] { synapse };
                 mapping[0][i] = dendrites;
 
-                var soma = somaFactory.Create(dendrites);
+                var soma = somaFactory.Create(dendrites, _weightInitializer.InitializeWeight());
 
                 var terminals = new List<Synapse>();
                 for (int t = 0; t < numHiddenPerLayer; t++)
@@ -74,7 +74,7 @@ namespace ArtificialNeuralNetwork.Factories
                 {
                     var dendrites = getDendritesForSoma(h+2, i, mapping);
 
-                    var soma = somaFactory.Create(dendrites);
+                    var soma = somaFactory.Create(dendrites, _weightInitializer.InitializeWeight());
 
                     var terminals = new List<Synapse>();
                     for (int t = 0; t < numHiddenPerLayer; t++)
@@ -95,7 +95,7 @@ namespace ArtificialNeuralNetwork.Factories
                 {
                     var dendrites = getDendritesForSoma(numHiddenLayers + 1, i, mapping);
 
-                    var soma = somaFactory.Create(dendrites);
+                    var soma = somaFactory.Create(dendrites, _weightInitializer.InitializeWeight());
 
                     var terminals = new List<Synapse>();
                     for (int t = 0; t < numOutputs; t++)
@@ -115,7 +115,7 @@ namespace ArtificialNeuralNetwork.Factories
             for (int o = 0; o < numOutputs;o++)
             {
                 var dendrites = getDendritesForSoma(numHiddenLayers + 2, o, mapping);
-                var soma = somaFactory.Create(dendrites);
+                var soma = somaFactory.Create(dendrites, _weightInitializer.InitializeWeight());
 
                 var synapse = synapseFactory.Create();
                 var axon = axonFactory.Create(new [] {synapse});
