@@ -28,5 +28,14 @@ namespace ArtificialNeuralNetwork.Factories
                 Weight = _weightInitializer.InitializeWeight()
             };
         }
+
+        public Synapse Create(double weight)
+        {
+            return new Synapse
+            {
+                Value = 0.0,
+                Weight = weight
+            };
+        }
     }
 }
