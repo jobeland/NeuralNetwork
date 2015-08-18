@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ArtificialNeuralNetwork.Genes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -28,6 +29,13 @@ namespace ArtificialNeuralNetwork
             _axon.ProcessSignal(_soma.CalculateSummation());
         }
 
-        
+        public NeuronGene GetGenes()
+        {
+            return new NeuronGene
+            {
+                Soma = _soma.GetGenes(),
+                Axon = _axon.GetGenes()
+            };
+        }
     }
 }

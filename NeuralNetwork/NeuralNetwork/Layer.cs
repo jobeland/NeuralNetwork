@@ -1,4 +1,5 @@
 ﻿using ArtificialNeuralNetwork.ActivationFunctions;
+using ArtificialNeuralNetwork.Genes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +30,14 @@ namespace ArtificialNeuralNetwork
             {
                 n.Process();
             }
+        }
+
+        public LayerGene GetGenes()
+        {
+            return new LayerGene
+            {
+                Neurons = _neuronsInLayer.Select(n => n.GetGenes());
+            };
         }
     }
 

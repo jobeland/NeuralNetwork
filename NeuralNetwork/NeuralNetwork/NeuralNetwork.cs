@@ -1,4 +1,5 @@
 ﻿using ArtificialNeuralNetwork.ActivationFunctions;
+using ArtificialNeuralNetwork.Genes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -61,6 +62,16 @@ namespace ArtificialNeuralNetwork
                 outputs[i] = _outputs[i].Value;
             }
             return outputs;
+        }
+
+        public NeuralNetworkGene GetGenes()
+        {
+            return new NeuralNetworkGene
+            {
+                InputGene = _inputLayer.GetGenes(),
+                HiddenGenes = _hiddenLayers.Select(l => l.GetGenes()),
+                OutputGene = _outputLayer.GetGenes()
+            };
         }
 
         ///**
