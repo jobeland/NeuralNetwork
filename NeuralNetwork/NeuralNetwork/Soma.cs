@@ -28,5 +28,7 @@ namespace ArtificialNeuralNetwork
         {
             return _summationFunction.CalculateSummation(_dendrites, _bias);
         }
+
+
     }
 }

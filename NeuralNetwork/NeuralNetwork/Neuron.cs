@@ -27,5 +27,7 @@ namespace ArtificialNeuralNetwork
         {
             _axon.ProcessSignal(_soma.CalculateSummation());
         }
+
+        
     }
 }
