@@ -36,7 +36,7 @@ namespace ArtificialNeuralNetwork
         {
             return new LayerGene
             {
-                Neurons = _neuronsInLayer.Select(n => n.GetGenes());
+                Neurons = _neuronsInLayer.Select(n => n.GetGenes()).ToList()
             };
         }
     }

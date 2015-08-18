@@ -69,7 +69,7 @@ namespace ArtificialNeuralNetwork
             return new NeuralNetworkGene
             {
                 InputGene = _inputLayer.GetGenes(),
-                HiddenGenes = _hiddenLayers.Select(l => l.GetGenes()),
+                HiddenGenes = _hiddenLayers.Select(l => l.GetGenes()).ToList(),
                 OutputGene = _outputLayer.GetGenes()
             };
         }
