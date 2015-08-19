@@ -59,9 +59,9 @@ namespace ArtificialNeuralNetwork.Factories
             IList<INeuron> layerNeurons = new List<INeuron>();
             for (int i = 0; i < numberOfNeurons; i++)
             {
-                inputLayerNeurons.Add(CreateNeuron(somaFactory, axonFactory, synapseMapping, layerInNetwork, i));
+                layerNeurons.Add(CreateNeuron(somaFactory, axonFactory, synapseMapping, layerInNetwork, i));
             }
-            ILayer inputLayer = Layer.GetInstance(inputLayerNeurons);
+            return Layer.GetInstance(layerNeurons);
         }
 
         public INeuralNetwork Create(int numInputs, int numOutputs, int numHiddenLayers, int numHiddenPerLayer)
