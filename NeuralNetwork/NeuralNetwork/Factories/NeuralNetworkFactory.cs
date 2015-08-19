@@ -54,6 +54,16 @@ namespace ArtificialNeuralNetwork.Factories
             return synapses;
         }
 
+        internal ILayer CreateLayer(ISomaFactory somaFactory, IAxonFactory axonFactory, Dictionary<int, Dictionary<int, IList<Synapse>>> synapseMapping, int layerInNetwork, int numberOfNeurons)
+        {
+            IList<INeuron> layerNeurons = new List<INeuron>();
+            for (int i = 0; i < numberOfNeurons; i++)
+            {
+                inputLayerNeurons.Add(CreateNeuron(somaFactory, axonFactory, synapseMapping, layerInNetwork, i));
+            }
+            ILayer inputLayer = Layer.GetInstance(inputLayerNeurons);
+        }
+
         public INeuralNetwork Create(int numInputs, int numOutputs, int numHiddenLayers, int numHiddenPerLayer)
         {
             var somaFactory = SomaFactory.GetInstance(_summationFunction);
@@ -65,34 +75,16 @@ namespace ArtificialNeuralNetwork.Factories
             var inputs = GetAllSynapsesFromLayerMapping(mapping[0]);
             var outputs = GetAllSynapsesFromLayerMapping(mapping[mapping.Keys.Count - 1]);
 
-            //Input Layer
-            IList<INeuron> inputLayerNeurons = new List<INeuron>();
-            for (int i = 0; i < numInputs; i++)
-            {
-                inputLayerNeurons.Add(CreateNeuron(somaFactory, axonFactory, mapping, 0, i));
-            }
-            ILayer inputLayer = Layer.GetInstance(inputLayerNeurons);
+            ILayer inputLayer = CreateLayer(somaFactory, axonFactory, mapping, 0, numInputs);
 
-
-            IList<ILayer> hiddenLayers = new List<ILayer>();
             //Hidden layers
+            IList<ILayer> hiddenLayers = new List<ILayer>();
             for (int h = 0; h < numHiddenLayers; h++)
             {
-                IList<INeuron> hiddenNeuronsInLayer = new List<INeuron>();
-                for (int i = 0; i < numHiddenPerLayer; i++)
-                {
-                    hiddenNeuronsInLayer.Add(CreateNeuron(somaFactory, axonFactory, mapping, h + 1, i));
-                }
-                hiddenLayers.Add(Layer.GetInstance(hiddenNeuronsInLayer));
+                hiddenLayers.Add(CreateLayer(somaFactory, axonFactory, mapping, h + 1, numHiddenPerLayer));
             }
 
-            //Output layer
-            IList<INeuron> outputLayerNeurons = new List<INeuron>();
-            for (int o = 0; o < numOutputs; o++)
-            {
-                outputLayerNeurons.Add(CreateNeuron(somaFactory, axonFactory, mapping, numHiddenLayers + 1, o));
-            }
-            ILayer outputLayer = Layer.GetInstance(outputLayerNeurons);
+            ILayer outputLayer = CreateLayer(somaFactory, axonFactory, mapping, numHiddenLayers + 1, numOutputs);
 
             return NeuralNetwork.GetInstance(inputs, inputLayer, hiddenLayers, outputLayer, outputs);
         }
