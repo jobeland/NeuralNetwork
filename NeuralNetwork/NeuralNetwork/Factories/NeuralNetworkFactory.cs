@@ -10,7 +10,6 @@ namespace ArtificialNeuralNetwork.Factories
 {
     public class NeuralNetworkFactory : INeuralNetworkFactory
     {
-        //TODO: this class needs to create and setup the entire network
         private ISummationFunction _summationFunction;
         private IActivationFunction _activationFunction;
         private IWeightInitializer _weightInitializer;
@@ -95,66 +94,45 @@ namespace ArtificialNeuralNetwork.Factories
             //layer number + position in layer --> list of terminals
             var mapping = new Dictionary<int, Dictionary<int, IList<Synapse>>>();
 
-            //Input Layer
-            IList<Synapse> inputs = new List<Synapse>();
-            mapping[0] = new Dictionary<int, IList<Synapse>>();
-            mapping[1] = new Dictionary<int, IList<Synapse>>();
-            for (int i = 0; i < numInputs; i++)
-            {
-                var synapse = synapseFactory.Create();
+            //Input synapses
+            mapping[0] = CreateSynapseMapLayer(synapseFactory, numInputs, 1);
 
-                var dendrites = new[] { synapse };
-                mapping[0][i] = dendrites;
-
-                var terminals = new List<Synapse>();
-                for (int t = 0; t < numHiddenPerLayer; t++)
-                {
-                    terminals.Add(synapseFactory.Create());
-                }
-                mapping[1][i] = terminals;
-            }
+            //Input neuron terminals
+            mapping[1] = CreateSynapseMapLayer(synapseFactory, numInputs, numHiddenPerLayer);
 
             //Hidden layers 0 to (n-1)
             for (int h = 0; h < numHiddenLayers - 1; h++)
             {
-                mapping[h + 2] = new Dictionary<int, IList<Synapse>>();
-                for (int i = 0; i < numHiddenPerLayer; i++)
-                {
-                    var terminals = new List<Synapse>();
-                    for (int t = 0; t < numHiddenPerLayer; t++)
-                    {
-                        terminals.Add(synapseFactory.Create());
-                    }
-                    mapping[h + 2][i] = terminals;
-                }
+                mapping[h + 2] = CreateSynapseMapLayer(synapseFactory, numHiddenPerLayer, numHiddenPerLayer);
             }
 
             //Hidden layer n
-            mapping[numHiddenLayers + 1] = new Dictionary<int, IList<Synapse>>();
-            for (int i = 0; i < numHiddenPerLayer; i++)
-            {
-                var terminals = new List<Synapse>();
-                for (int t = 0; t < numOutputs; t++)
-                {
-                    terminals.Add(synapseFactory.Create());
-                }
-                mapping[numHiddenLayers + 1][i] = terminals;
-            }
+            mapping[numHiddenLayers + 1] = CreateSynapseMapLayer(synapseFactory, numHiddenPerLayer, numOutputs);
 
             //Output layer
-            mapping[numHiddenLayers + 2] = new Dictionary<int, IList<Synapse>>();
-            for (int o = 0; o < numOutputs; o++)
-            {
-                var synapse = synapseFactory.Create();
-                var terminals = new List<Synapse>();
-                for (int t = 0; t < numOutputs; t++)
-                {
-                    terminals.Add(synapseFactory.Create());
-                }
-                mapping[numHiddenLayers + 2][o] = terminals;
-            }
+            mapping[numHiddenLayers + 2] = CreateSynapseMapLayer(synapseFactory, numOutputs, 1);
 
             return mapping;
+        }
+
+        internal Dictionary<int, IList<Synapse>> CreateSynapseMapLayer(ISynapseFactory synapseFactory, int numberOfNeuronsInLayer, int numberOfTerminalsPerNeuron)
+        {
+            var mapLayer = new Dictionary<int, IList<Synapse>>();
+            for (int i = 0; i < numberOfNeuronsInLayer; i++)
+            {
+                mapLayer[i] = CreateTerminals(synapseFactory, numberOfTerminalsPerNeuron);
+            }
+            return mapLayer;
+        }
+
+        internal IList<Synapse> CreateTerminals(ISynapseFactory synapseFactory, int numberOfSynapses)
+        {
+            var terminals = new List<Synapse>();
+            for (int t = 0; t < numberOfSynapses; t++)
+            {
+                terminals.Add(synapseFactory.Create());
+            }
+            return terminals;
         }
 
         private IList<Synapse> getDendritesForSoma(int layer, int terminalIndexInLayer, Dictionary<int, Dictionary<int, IList<Synapse>>> mapping)
