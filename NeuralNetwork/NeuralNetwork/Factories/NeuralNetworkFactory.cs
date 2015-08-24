@@ -139,9 +139,9 @@ namespace ArtificialNeuralNetwork.Factories
         private IList<Synapse> getDendritesForSoma(int layer, int terminalIndexInLayer, Dictionary<int, Dictionary<int, IList<Synapse>>> mapping)
         {
             //get entire layer before, then grab the nth synapse from each list
-            if (layer <= 1)
+            if (layer < 1)
             {
-                throw new ArgumentOutOfRangeException("layer must be > 1");
+                throw new ArgumentOutOfRangeException("layer must be > 0");
             }
 
             var neuronMappings = mapping[layer];

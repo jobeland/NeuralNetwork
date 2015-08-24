@@ -13,10 +13,10 @@ namespace UnsupervisedTraining
     public class TrainingSession
     {
         private int _sessionNumber;
-        private NeuralNetwork _nn;
+        private INeuralNetwork _nn;
         private Game _game;
 
-        public TrainingSession(NeuralNetwork nn, Game game, int sessionNumber)
+        public TrainingSession(INeuralNetwork nn, Game game, int sessionNumber)
         {
             _nn = nn;
             _game = game;

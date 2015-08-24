@@ -1,5 +1,7 @@
 ﻿using ArtificialNeuralNetwork;
 using ArtificialNeuralNetwork.ActivationFunctions;
+using ArtificialNeuralNetwork.Factories;
+using ArtificialNeuralNetwork.Genes;
 using BasicGame;
 using Logging;
 using System;
@@ -18,10 +20,12 @@ namespace UnsupervisedTraining
         public static int GENERATIONS_PER_EPOCH = 100;
         public int Population { get; set; }
         public double[] Evals { get; set; }
-        public NeuralNetwork[] NetsForGeneration { get; set; }
+        public INeuralNetwork[] NetsForGeneration { get; set; }
+        private INeuralNetworkFactory _networkFactory;
         public EvalWorkingSet History { get; set; }
         public IList<TrainingSession> _sessions { get; set; }
         private readonly IActivationFunction _activationFunction;
+        private readonly ISummationFunction _summationFunction;
         public bool SavedAtleastOne = false;
         public static double MUTATE_CHANCE = 0.05;
         private object ObjectLock;
@@ -29,6 +33,7 @@ namespace UnsupervisedTraining
 
         private static int INPUT_NEURONS = 1;
         private static int HIDDEN_NEURONS = 3;
+        private static int NUM_HIDDEN_LAYERS = 1;
         private static int OUTPUT_NEURONS = 1;
         private static bool USE_MULTITHREADING = true;
 
@@ -39,13 +44,15 @@ namespace UnsupervisedTraining
         {
             this.Population = pop;
             Evals = new double[pop];
-            _activationFunction = new InverseActivationFunction();
+            _activationFunction = new TanhActivationFunction();
+            _summationFunction = new SimpleSummation();
             NetsForGeneration = new NeuralNetwork[pop];
             _sessions = new List<TrainingSession>();
+            _networkFactory = NeuralNetworkFactory.GetInstance(SomaFactory.GetInstance(_summationFunction), AxonFactory.GetInstance(_activationFunction), SynapseFactory.GetInstance(new RandomWeightInitializer(new Random())), SynapseFactory.GetInstance(new ConstantWeightInitializer(1.0)), new RandomWeightInitializer(new Random()));
             for (int i = 0; i < pop; i++)
             {
                 Evals[i] = -1;
-                NetsForGeneration[i] = new NeuralNetwork(INPUT_NEURONS, HIDDEN_NEURONS, OUTPUT_NEURONS, _activationFunction);//TODO: why is this a hardcoded value?
+                NetsForGeneration[i] = _networkFactory.Create(INPUT_NEURONS, OUTPUT_NEURONS, NUM_HIDDEN_LAYERS, HIDDEN_NEURONS);// new NeuralNetwork(INPUT_NEURONS, HIDDEN_NEURONS, OUTPUT_NEURONS, _activationFunction);//TODO: why is this a hardcoded value?
             }
             History = new EvalWorkingSet(50);//TODO: why is this a hardcoded value?
             ObjectLock = new object();
@@ -57,7 +64,7 @@ namespace UnsupervisedTraining
             for (int i = 0; i < NetsForGeneration.Length; i++)
             {
                 _sessions.Add(new TrainingSession(NetsForGeneration[i], new Game(10, 10, 300), i));
-                
+
             }
             if (USE_MULTITHREADING)
             {
@@ -72,13 +79,13 @@ namespace UnsupervisedTraining
                 {
                     session.Run();
                 }
-            }            
+            }
         }
 
         public void GetEvalsForGeneration()
         {
             //TODO: this shouldn't be in Evals anymore, but just called directly off of the training session
-            for(int i = 0; i < _sessions.Count; i++)
+            for (int i = 0; i < _sessions.Count; i++)
             {
                 Evals[i] = _sessions[i].GetSessionEvaluation();
             }
@@ -115,14 +122,14 @@ namespace UnsupervisedTraining
 
                 }
 
-                NeuralNetwork bestPerformer = getBestPerformer();
+                INeuralNetwork bestPerformer = getBestPerformer();
                 //NNUtils.saveNetwork(bestPerformer,"TANHHidden4" + "Epoch" + epoch + "Eval" + ((int)getBestEvalOfGeneration()));
                 // at end of epoch, save top 10% of neural networks
             }
 
         }
 
-        private NeuralNetwork getBestPerformer()
+        private INeuralNetwork getBestPerformer()
         {
             int numberOfTopPerformersToChoose = (int)(Population * 0.50);
             int[] indicesToKeep = new int[numberOfTopPerformersToChoose];
@@ -251,11 +258,11 @@ namespace UnsupervisedTraining
                 LoggerFactory.GetLogger().Log(LogLevel.Info, "Mutation set to NORMAL");
             }
 
-            List<NeuralNetwork> children = breed(indicesToKeep);
-            List<NeuralNetwork> toKeep = keep(indicesToKeep);
-            List<NeuralNetwork> mutated = mutate(indicesToKeep);
-            List<NeuralNetwork> newSpecies = getNewNetworks();
-            List<NeuralNetwork> allToAdd = new List<NeuralNetwork>();
+            List<INeuralNetwork> children = breed(indicesToKeep);
+            List<INeuralNetwork> toKeep = keep(indicesToKeep);
+            List<INeuralNetwork> mutated = mutate(indicesToKeep);
+            List<INeuralNetwork> newSpecies = getNewNetworks();
+            List<INeuralNetwork> allToAdd = new List<INeuralNetwork>();
             allToAdd.AddRange(newSpecies);
             allToAdd.AddRange(children);
             allToAdd.AddRange(mutated);
@@ -269,83 +276,111 @@ namespace UnsupervisedTraining
 
         }
 
-        private List<NeuralNetwork> getNewNetworks()
+        private List<INeuralNetwork> getNewNetworks()
         {
             int numToGen = (int)(Population * 0.1);
-            List<NeuralNetwork> newNets = new List<NeuralNetwork>();
+            List<INeuralNetwork> newNets = new List<INeuralNetwork>();
             for (int i = 0; i < numToGen; i++)
             {
-                NeuralNetwork newNet = new NeuralNetwork(INPUT_NEURONS, HIDDEN_NEURONS, OUTPUT_NEURONS, _activationFunction);
+                INeuralNetwork newNet = _networkFactory.Create(INPUT_NEURONS, OUTPUT_NEURONS, NUM_HIDDEN_LAYERS, HIDDEN_NEURONS);
                 newNets.Add(newNet);
             }
             return newNets;
         }
 
-        private List<NeuralNetwork> keep(int[] indicesToKeep)
+        private List<INeuralNetwork> keep(int[] indicesToKeep)
         {
-            List<NeuralNetwork> toKeep = new List<NeuralNetwork>();
+            List<INeuralNetwork> toKeep = new List<INeuralNetwork>();
             for (int i = 0; i < indicesToKeep.Length; i++)
             {
-                NeuralNetwork goodPerformer = NetsForGeneration[indicesToKeep[i]];
+                INeuralNetwork goodPerformer = NetsForGeneration[indicesToKeep[i]];
                 toKeep.Add(goodPerformer);
             }
             return toKeep;
         }
 
-        private List<NeuralNetwork> mutate(int[] indicesToKeep)
+        private List<INeuralNetwork> mutate(int[] indicesToKeep)
         {
             int numToMutate = (int)(Population * 0.1);
             // chance of mutation is 5% for now
             int numMutated = 0;
-            List<NeuralNetwork> mutated = new List<NeuralNetwork>();
+            List<INeuralNetwork> mutated = new List<INeuralNetwork>();
             Random random = new Random();
             while (numMutated < numToMutate)
             {
                 int i = new Random().Next(indicesToKeep.Length);
-                NeuralNetwork goodPerformer = NetsForGeneration[indicesToKeep[i]];
-                List<List<Double[]>> genes = goodPerformer.getWeightMatrix();
-                List<List<Double[]>> childGenes = new List<List<Double[]>>();
+                INeuralNetwork goodPerformer = NetsForGeneration[indicesToKeep[i]];
+                NeuralNetworkGene childGenes = goodPerformer.GetGenes();
 
-                for (int layer = 0; layer < genes.Count; layer++)
+                for (int n = 0; n < childGenes.InputGene.Neurons.Count; n++)
                 {
-                    List<Double[]> motherLayer = genes[layer];
-                    List<Double[]> childLayer = new List<Double[]>();
-                    for (int n = 0; n < motherLayer.Count; n++)
-                    {
-                        Double[] motherNeuronWeights = motherLayer[n];
-                        Double[] childNeuronWeights = new Double[motherNeuronWeights.Length];
-
-                        for (int weightIndex = 0; weightIndex < childNeuronWeights.Length; weightIndex++)
-                        {
-                            if (new Random().NextDouble() > MUTATE_CHANCE)
-                            {
-                                childNeuronWeights[weightIndex] = motherNeuronWeights[weightIndex];
-                            }
-                            else
-                            {
-                                double val = new Random().NextDouble();
-                                if (new Random().NextDouble() < 0.5)
-                                {
-                                    // 50% chance of being negative, being between -1 and 1
-                                    val = 0 - val;
-                                }
-                                childNeuronWeights[weightIndex] = val;
-                            }
-                        }
-                        childLayer.Add(childNeuronWeights);
-                    }
-                    childGenes.Add(childLayer);
+                    var neuron = childGenes.InputGene.Neurons[n];
+                    childGenes.InputGene.Neurons[n] = TryMutateNeuron(neuron, random);
                 }
 
-                NeuralNetwork child = new NeuralNetwork(INPUT_NEURONS, HIDDEN_NEURONS, OUTPUT_NEURONS, _activationFunction);
-                child.setWeightMatrix(childGenes);
-                mutated.Add(child);
+                for (int h = 0; h < childGenes.HiddenGenes.Count; h++)
+                {
+                    for (int j = 0; j < childGenes.HiddenGenes[h].Neurons.Count; j++)
+                    {
+                        var neuron = childGenes.HiddenGenes[h].Neurons[j];
+                        childGenes.HiddenGenes[h].Neurons[j] = TryMutateNeuron(neuron, random);
+                    }
+                }
+                mutated.Add(_networkFactory.Create(childGenes));
                 numMutated++;
             }
             return mutated;
         }
 
-        private List<NeuralNetwork> breed(int[] indicesToKeep)
+        internal NeuronGene TryMutateNeuron(NeuronGene gene, Random random)
+        {
+            NeuronGene toReturn = new NeuronGene
+            {
+                Axon = new AxonGene
+                {
+                    Weights = new List<double>(),
+                    ActivationFunction = gene.Axon.ActivationFunction
+                },
+                Soma = new SomaGene
+                {
+                    SummationFunction = gene.Soma.SummationFunction
+                }
+            };
+            for (int j = 0; j < gene.Axon.Weights.Count; j++)
+            {
+                if (random.NextDouble() < MUTATE_CHANCE)
+                {
+                    double val = random.NextDouble();
+                    if (random.NextDouble() < 0.5)
+                    {
+                        // 50% chance of being negative, being between -1 and 1
+                        val = 0 - val;
+                    }
+                    toReturn.Axon.Weights.Add(val);
+                }
+                else
+                {
+                    toReturn.Axon.Weights.Add(gene.Axon.Weights[j]);
+                }
+            }
+            if (random.NextDouble() < MUTATE_CHANCE)
+            {
+                double val = random.NextDouble();
+                if (random.NextDouble() < 0.5)
+                {
+                    // 50% chance of being negative, being between -1 and 1
+                    val = 0 - val;
+                }
+                toReturn.Soma.Bias = val;
+            }
+            else
+            {
+                toReturn.Soma.Bias = gene.Soma.Bias;
+            }
+            return gene;
+        }
+
+        private List<INeuralNetwork> breed(int[] indicesToKeep)
         {
             int numToBreed = (int)(Population * 0.3);
             double sumOfAllEvals = 0;
@@ -358,7 +393,7 @@ namespace UnsupervisedTraining
                 sumOfAllEvals = 1;
             }
 
-            List<NeuralNetwork> children = new List<NeuralNetwork>();
+            List<INeuralNetwork> children = new List<INeuralNetwork>();
             for (int bred = 0; bred < numToBreed; bred++)
             {
                 List<WeightedIndex> toChooseFrom = new List<WeightedIndex>();
@@ -386,14 +421,14 @@ namespace UnsupervisedTraining
                 // choose mother
                 WeightedIndex index1 = chooseIndex(toChooseFrom);
                 toChooseFrom.Remove(index1);
-                NeuralNetwork mother = NetsForGeneration[index1.Index];
+                INeuralNetwork mother = NetsForGeneration[index1.Index];
 
                 // choose father
                 WeightedIndex index2 = chooseIndex(toChooseFrom);
                 toChooseFrom.Remove(index2);
-                NeuralNetwork father = NetsForGeneration[index2.Index];
+                INeuralNetwork father = NetsForGeneration[index2.Index];
 
-                NeuralNetwork child = mate(mother, father);
+                INeuralNetwork child = mate(mother, father);
                 children.Add(child);
             }
 
@@ -401,40 +436,86 @@ namespace UnsupervisedTraining
 
         }
 
-        private NeuralNetwork mate(NeuralNetwork mother, NeuralNetwork father)
+        private INeuralNetwork mate(INeuralNetwork mother, INeuralNetwork father)
         {
-            List<List<Double[]>> motherGenes = mother.getWeightMatrix();
-            List<List<Double[]>> fatherGenes = father.getWeightMatrix();
-            List<List<Double[]>> childGenes = new List<List<Double[]>>();
-            for (int layer = 0; layer < motherGenes.Count; layer++)
-            {
-                List<Double[]> motherLayer = motherGenes[layer];
-                List<Double[]> fatherLayer = fatherGenes[layer];
-                List<Double[]> childLayer = new List<Double[]>();
-                for (int n = 0; n < motherLayer.Count; n++)
-                {
-                    Double[] motherNeuronWeights = motherLayer[n];
-                    Double[] fatherNeuronWeights = fatherLayer[n];
-                    Double[] childNeuronWeights = new Double[motherNeuronWeights.Length];
+            NeuralNetworkGene motherGenes = mother.GetGenes();
+            NeuralNetworkGene childFatherGenes = father.GetGenes();
+            Random random = new Random();
 
-                    for (int i = 0; i < childNeuronWeights.Length; i++)
-                    {
-                        if (new Random().NextDouble() > 0.5)
-                        {
-                            childNeuronWeights[i] = motherNeuronWeights[i];
-                        }
-                        else
-                        {
-                            childNeuronWeights[i] = fatherNeuronWeights[i];
-                        }
-                    }
-                    childLayer.Add(childNeuronWeights);
-                }
-                childGenes.Add(childLayer);
+            for (int n = 0; n < childFatherGenes.InputGene.Neurons.Count; n++)
+            {
+                var neuron = childFatherGenes.InputGene.Neurons[n];
+                var motherNeuron = motherGenes.InputGene.Neurons[n];
+                childFatherGenes.InputGene.Neurons[n] = BreedNeuron(neuron, motherNeuron, random);
             }
-            NeuralNetwork child = new NeuralNetwork(INPUT_NEURONS, HIDDEN_NEURONS, OUTPUT_NEURONS, _activationFunction);
-            child.setWeightMatrix(childGenes);
+
+            for (int h = 0; h < childFatherGenes.HiddenGenes.Count; h++)
+            {
+                for (int j = 0; j < childFatherGenes.HiddenGenes[h].Neurons.Count; j++)
+                {
+                    var neuron = childFatherGenes.HiddenGenes[h].Neurons[j];
+                    var motherNeuron = motherGenes.HiddenGenes[h].Neurons[j];
+                    childFatherGenes.HiddenGenes[h].Neurons[j] = BreedNeuron(neuron, motherNeuron, random);
+                }
+            }
+
+            for (int n = 0; n < childFatherGenes.OutputGene.Neurons.Count; n++)
+            {
+                var neuron = childFatherGenes.OutputGene.Neurons[n];
+                var motherNeuron = motherGenes.OutputGene.Neurons[n];
+                childFatherGenes.OutputGene.Neurons[n] = BreedNeuron(neuron, motherNeuron, random);
+            }
+
+            INeuralNetwork child = _networkFactory.Create(childFatherGenes);
             return child;
+        }
+
+        internal NeuronGene BreedNeuron(NeuronGene father, NeuronGene mother, Random random)
+        {
+            NeuronGene toReturn = new NeuronGene
+            {
+                Axon = new AxonGene
+                {
+                    Weights = new List<double>()
+                },
+                Soma = new SomaGene()
+            };
+            for (int j = 0; j < father.Axon.Weights.Count; j++)
+            {
+                if (random.NextDouble() < 0.5)
+                {
+                    toReturn.Axon.Weights.Add(mother.Axon.Weights[j]);
+                }
+                else
+                {
+                    toReturn.Axon.Weights.Add(father.Axon.Weights[j]);
+                }
+            }
+            if (random.NextDouble() < 0.5)
+            {
+                toReturn.Axon.ActivationFunction = mother.Axon.ActivationFunction;
+            }
+            else
+            {
+                toReturn.Axon.ActivationFunction = father.Axon.ActivationFunction;
+            }
+            if(random.NextDouble() < 0.5)
+            {
+                toReturn.Soma.SummationFunction = mother.Soma.SummationFunction;
+            }
+            else
+            {
+                toReturn.Soma.SummationFunction = father.Soma.SummationFunction;
+            }
+            if(random.NextDouble() < 0.5)
+            {
+                toReturn.Soma.Bias = mother.Soma.Bias;
+            }
+            else
+            {
+                toReturn.Soma.Bias = father.Soma.Bias;
+            }
+            return toReturn;
         }
 
         private WeightedIndex chooseIndex(List<WeightedIndex> indices)
