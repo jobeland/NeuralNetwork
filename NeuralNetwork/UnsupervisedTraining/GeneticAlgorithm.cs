@@ -17,7 +17,7 @@ namespace UnsupervisedTraining
     public class GeneticAlgorithm
     {
 
-        public static int GENERATIONS_PER_EPOCH = 100;
+        public static int GENERATIONS_PER_EPOCH = 1;
         public int Population { get; set; }
         public double[] Evals { get; set; }
         public INeuralNetwork[] NetsForGeneration { get; set; }
@@ -123,6 +123,9 @@ namespace UnsupervisedTraining
                 }
 
                 INeuralNetwork bestPerformer = getBestPerformer();
+
+                var saver = new NeuralNetworkSaver("\\networks");
+                saver.SaveNeuralNetwork(bestPerformer, getBestEvalOfGeneration(), epoch);
                 //NNUtils.saveNetwork(bestPerformer,"TANHHidden4" + "Epoch" + epoch + "Eval" + ((int)getBestEvalOfGeneration()));
                 // at end of epoch, save top 10% of neural networks
             }
