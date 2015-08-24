@@ -36,7 +36,7 @@ namespace ArtificialNeuralNetwork
 
         internal void updateTerminals(double outputSignal)
         {
-            foreach(Synapse synapse in _terminals)
+            foreach (Synapse synapse in _terminals)
             {
                 synapse.Value = outputSignal;
             }
@@ -46,7 +46,8 @@ namespace ArtificialNeuralNetwork
         {
             return new AxonGene
             {
-                ActivationFunction = _activationFunction.GetType()
+                ActivationFunction = _activationFunction.GetType(),
+                Weights = _terminals.Select(d => d.Weight).ToList()
             };
         }
 

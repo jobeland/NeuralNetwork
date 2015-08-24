@@ -36,7 +36,6 @@ namespace ArtificialNeuralNetwork
             return new SomaGene
             {
                 Bias = _bias,
-                Weights = _dendrites.Select(d => d.Weight).ToList(),
                 SummationFunction = _summationFunction.GetType()
             };
         }

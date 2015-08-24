@@ -10,5 +10,6 @@ namespace ArtificialNeuralNetwork.Genes
     public class AxonGene
     {
         public Type ActivationFunction;
+        public IList<double> Weights;
     }
 }
