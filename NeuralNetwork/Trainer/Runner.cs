@@ -22,7 +22,15 @@ namespace Trainer
                 SummationFunction = new SimpleSummation(),
                 ActivationFunction = new TanhActivationFunction()
             };
-            GeneticAlgorithm evolver = new GeneticAlgorithm(1000, networkConfig);
+            GeneticAlgorithmConfigurationSettings GASettings = new GeneticAlgorithmConfigurationSettings
+            {
+                UseMultithreading = true,
+                NormalMutationRate = 0.05,
+                HighMutationRate = 0.5,
+                GenerationsPerEpoch = 100,
+                GenerationPopulation = 1000
+            };
+            GeneticAlgorithm evolver = new GeneticAlgorithm(networkConfig, GASettings);
             evolver.runEpoch();
         }
     }

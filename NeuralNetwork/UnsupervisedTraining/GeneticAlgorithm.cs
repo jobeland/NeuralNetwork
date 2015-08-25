@@ -26,23 +26,20 @@ namespace UnsupervisedTraining
         
 
         private readonly NeuralNetworkConfigurationSettings _networkConfig;
+        private readonly GeneticAlgorithmConfigurationSettings _geneticConfig;
 
-        public static double MUTATE_CHANCE = 0.05;
-        private static bool USE_MULTITHREADING = true;
-        public static int GENERATIONS_PER_EPOCH = 100;
-        public int Population { get; set; }
-        private static double HIGH_MUTATION = 0.5;
-        private static double NORMAL_MUTATION = 0.05;
+        private double _mutateChance;
+       
 
-        public GeneticAlgorithm(int pop, NeuralNetworkConfigurationSettings networkConfig)
+        public GeneticAlgorithm(NeuralNetworkConfigurationSettings networkConfig, GeneticAlgorithmConfigurationSettings geneticConfig)
         {
             _networkConfig = networkConfig;
-            this.Population = pop;
-            Evals = new double[pop];
+            _geneticConfig = geneticConfig;
+            Evals = new double[_geneticConfig.GenerationPopulation];
             //NetsForGeneration = new NeuralNetwork[pop];
             _sessions = new List<TrainingSession>();
             _networkFactory = NeuralNetworkFactory.GetInstance(SomaFactory.GetInstance(_networkConfig.SummationFunction), AxonFactory.GetInstance(_networkConfig.ActivationFunction), SynapseFactory.GetInstance(new RandomWeightInitializer(new Random())), SynapseFactory.GetInstance(new ConstantWeightInitializer(1.0)), new RandomWeightInitializer(new Random()));
-            for (int i = 0; i < pop; i++)
+            for (int i = 0; i < _geneticConfig.GenerationPopulation; i++)
             {
                 Evals[i] = -1;
                 //NetsForGeneration[i] = _networkFactory.Create(INPUT_NEURONS, OUTPUT_NEURONS, NUM_HIDDEN_LAYERS, HIDDEN_NEURONS);// new NeuralNetwork(INPUT_NEURONS, HIDDEN_NEURONS, OUTPUT_NEURONS, _activationFunction);//TODO: why is this a hardcoded value?
@@ -59,7 +56,7 @@ namespace UnsupervisedTraining
             //    _sessions.Add(new TrainingSession(NetsForGeneration[i], new Game(10, 10, 300), i));
 
             //}
-            if (USE_MULTITHREADING)
+            if (_geneticConfig.UseMultithreading)
             {
                 Parallel.ForEach<TrainingSession>(_sessions, session =>
                     {
@@ -89,7 +86,7 @@ namespace UnsupervisedTraining
         {
             for (int epoch = 0; epoch < 1000; epoch++)
             {
-                for (int generation = 0; generation < GENERATIONS_PER_EPOCH; generation++)
+                for (int generation = 0; generation < _geneticConfig.GenerationsPerEpoch; generation++)
                 {
                     RunGeneration();
 
@@ -127,7 +124,7 @@ namespace UnsupervisedTraining
 
         private INeuralNetwork getBestPerformer()
         {
-            int numberOfTopPerformersToChoose = (int)(Population * 0.50);
+            int numberOfTopPerformersToChoose = (int)(_geneticConfig.GenerationPopulation * 0.50);
             int[] indicesToKeep = new int[numberOfTopPerformersToChoose];
             for (int i = 0; i < numberOfTopPerformersToChoose; i++)
             {
@@ -157,7 +154,7 @@ namespace UnsupervisedTraining
 
         private double getBestEvalOfGeneration()
         {
-            int numberOfTopPerformersToChoose = (int)(Population * 0.50);
+            int numberOfTopPerformersToChoose = (int)(_geneticConfig.GenerationPopulation * 0.50);
             int[] indicesToKeep = new int[numberOfTopPerformersToChoose];
             for (int i = 0; i < numberOfTopPerformersToChoose; i++)
             {
@@ -207,7 +204,7 @@ namespace UnsupervisedTraining
              * Also add brand new ones just to mix things up a bit and prevent a local maxima?
              */
 
-            int numberOfTopPerformersToChoose = (int)(Population * 0.50);
+            int numberOfTopPerformersToChoose = (int)(_geneticConfig.GenerationPopulation * 0.50);
             int[] indicesToKeep = new int[numberOfTopPerformersToChoose];
             for (int i = 0; i < numberOfTopPerformersToChoose; i++)
             {
@@ -245,12 +242,12 @@ namespace UnsupervisedTraining
             //		 }
             if (History.IsStale())
             {
-                MUTATE_CHANCE = HIGH_MUTATION;
+                _mutateChance = _geneticConfig.HighMutationRate;
                 LoggerFactory.GetLogger().Log(LogLevel.Info, "Eval history is stale, setting mutation to HIGH");
             }
             else
             {
-                MUTATE_CHANCE = NORMAL_MUTATION;
+                _mutateChance = _geneticConfig.NormalMutationRate;
                 LoggerFactory.GetLogger().Log(LogLevel.Info, "Mutation set to NORMAL");
             }
 
@@ -275,7 +272,7 @@ namespace UnsupervisedTraining
 
         private List<INeuralNetwork> getNewNetworks()
         {
-            int numToGen = (int)(Population * 0.1);
+            int numToGen = (int)(_geneticConfig.GenerationPopulation * 0.1);
             List<INeuralNetwork> newNets = new List<INeuralNetwork>();
             for (int i = 0; i < numToGen; i++)
             {
@@ -298,14 +295,13 @@ namespace UnsupervisedTraining
 
         private List<INeuralNetwork> mutate(int[] indicesToKeep)
         {
-            int numToMutate = (int)(Population * 0.1);
-            // chance of mutation is 5% for now
+            int numToMutate = (int)(_geneticConfig.GenerationPopulation * 0.1);
             int numMutated = 0;
             List<INeuralNetwork> mutated = new List<INeuralNetwork>();
             Random random = new Random();
             while (numMutated < numToMutate)
             {
-                int i = new Random().Next(indicesToKeep.Length);
+                int i = random.Next(indicesToKeep.Length);
                 INeuralNetwork goodPerformer = _sessions[indicesToKeep[i]]._nn;
                 NeuralNetworkGene childGenes = goodPerformer.GetGenes();
 
@@ -345,7 +341,7 @@ namespace UnsupervisedTraining
             };
             for (int j = 0; j < gene.Axon.Weights.Count; j++)
             {
-                if (random.NextDouble() < MUTATE_CHANCE)
+                if (random.NextDouble() <= _mutateChance)
                 {
                     double val = random.NextDouble();
                     if (random.NextDouble() < 0.5)
@@ -360,7 +356,7 @@ namespace UnsupervisedTraining
                     toReturn.Axon.Weights.Add(gene.Axon.Weights[j]);
                 }
             }
-            if (random.NextDouble() < MUTATE_CHANCE)
+            if (random.NextDouble() <= _mutateChance)
             {
                 double val = random.NextDouble();
                 if (random.NextDouble() < 0.5)
@@ -379,7 +375,7 @@ namespace UnsupervisedTraining
 
         private List<INeuralNetwork> breed(int[] indicesToKeep)
         {
-            int numToBreed = (int)(Population * 0.3);
+            int numToBreed = (int)(_geneticConfig.GenerationPopulation * 0.3);
             double sumOfAllEvals = 0;
             for (int i = 0; i < indicesToKeep.Length; i++)
             {
