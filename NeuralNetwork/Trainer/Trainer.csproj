@@ -49,6 +49,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\NeuralNetwork\NeuralNetwork.csproj">
+      <Project>{31e24d6e-afcf-4522-aeba-ccccd817bb85}</Project>
+      <Name>NeuralNetwork</Name>
+    </ProjectReference>
     <ProjectReference Include="..\UnsupervisedTraining\UnsupervisedTraining.csproj">
       <Project>{d7a7d828-bdb6-4289-aac7-3115cc63f692}</Project>
       <Name>UnsupervisedTraining</Name>

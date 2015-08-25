@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ArtificialNeuralNetwork;
+using ArtificialNeuralNetwork.ActivationFunctions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,7 +18,9 @@ namespace Trainer
                 NumInputNeurons = 1,
                 NumOutputNeurons = 1,
                 NumHiddenLayers = 1,
-                NumHiddenNeurons = 3
+                NumHiddenNeurons = 3,
+                SummationFunction = new SimpleSummation(),
+                ActivationFunction = new TanhActivationFunction()
             };
             GeneticAlgorithm evolver = new GeneticAlgorithm(1000, networkConfig);
             evolver.runEpoch();

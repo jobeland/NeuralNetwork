@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ArtificialNeuralNetwork;
+using ArtificialNeuralNetwork.ActivationFunctions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,5 +14,7 @@ namespace UnsupervisedTraining
         public int NumHiddenNeurons { get; set; }
         public int NumHiddenLayers { get; set; }
         public int NumOutputNeurons { get; set; }
+        public ISummationFunction SummationFunction { get; set; }
+        public IActivationFunction ActivationFunction { get; set; }
     }
 }

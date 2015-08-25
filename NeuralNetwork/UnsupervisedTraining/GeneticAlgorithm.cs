@@ -17,20 +17,20 @@ namespace UnsupervisedTraining
     public class GeneticAlgorithm
     {
 
-        public static int GENERATIONS_PER_EPOCH = 100;
-        public int Population { get; set; }
+        
         public double[] Evals { get; set; }
         private INeuralNetworkFactory _networkFactory;
         public EvalWorkingSet History { get; set; }
         public IList<TrainingSession> _sessions { get; set; }
-        private readonly IActivationFunction _activationFunction;
-        private readonly ISummationFunction _summationFunction;
-        public static double MUTATE_CHANCE = 0.05;
+        
+        
 
         private readonly NeuralNetworkConfigurationSettings _networkConfig;
 
+        public static double MUTATE_CHANCE = 0.05;
         private static bool USE_MULTITHREADING = true;
-
+        public static int GENERATIONS_PER_EPOCH = 100;
+        public int Population { get; set; }
         private static double HIGH_MUTATION = 0.5;
         private static double NORMAL_MUTATION = 0.05;
 
@@ -39,11 +39,9 @@ namespace UnsupervisedTraining
             _networkConfig = networkConfig;
             this.Population = pop;
             Evals = new double[pop];
-            _activationFunction = new TanhActivationFunction();
-            _summationFunction = new SimpleSummation();
             //NetsForGeneration = new NeuralNetwork[pop];
             _sessions = new List<TrainingSession>();
-            _networkFactory = NeuralNetworkFactory.GetInstance(SomaFactory.GetInstance(_summationFunction), AxonFactory.GetInstance(_activationFunction), SynapseFactory.GetInstance(new RandomWeightInitializer(new Random())), SynapseFactory.GetInstance(new ConstantWeightInitializer(1.0)), new RandomWeightInitializer(new Random()));
+            _networkFactory = NeuralNetworkFactory.GetInstance(SomaFactory.GetInstance(_networkConfig.SummationFunction), AxonFactory.GetInstance(_networkConfig.ActivationFunction), SynapseFactory.GetInstance(new RandomWeightInitializer(new Random())), SynapseFactory.GetInstance(new ConstantWeightInitializer(1.0)), new RandomWeightInitializer(new Random()));
             for (int i = 0; i < pop; i++)
             {
                 Evals[i] = -1;
