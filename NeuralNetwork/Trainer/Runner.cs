@@ -11,7 +11,14 @@ namespace Trainer
     {
         static void Main(string[] args)
         {
-            GeneticAlgorithm evolver = new GeneticAlgorithm(1000);
+            NeuralNetworkConfigurationSettings networkConfig = new NeuralNetworkConfigurationSettings
+            {
+                NumInputNeurons = 1,
+                NumOutputNeurons = 1,
+                NumHiddenLayers = 1,
+                NumHiddenNeurons = 3
+            };
+            GeneticAlgorithm evolver = new GeneticAlgorithm(1000, networkConfig);
             evolver.runEpoch();
         }
     }

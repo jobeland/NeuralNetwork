@@ -527,12 +527,6 @@ namespace UnsupervisedTraining
             }
             return indices.Last(index => index.CumlativeWeight <= value);
         }
-
-        public static void main(String[] args)
-        {
-            GeneticAlgorithm evolver = new GeneticAlgorithm(500);
-            evolver.runEpoch();
-        }
     }
 
 }
