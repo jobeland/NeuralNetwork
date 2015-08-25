@@ -17,18 +17,15 @@ namespace UnsupervisedTraining
     public class GeneticAlgorithm
     {
 
-        public static int GENERATIONS_PER_EPOCH = 1;
+        public static int GENERATIONS_PER_EPOCH = 100;
         public int Population { get; set; }
         public double[] Evals { get; set; }
-        public INeuralNetwork[] NetsForGeneration { get; set; }
         private INeuralNetworkFactory _networkFactory;
         public EvalWorkingSet History { get; set; }
         public IList<TrainingSession> _sessions { get; set; }
         private readonly IActivationFunction _activationFunction;
         private readonly ISummationFunction _summationFunction;
-        public bool SavedAtleastOne = false;
         public static double MUTATE_CHANCE = 0.05;
-        private object ObjectLock;
 
 
         private static int INPUT_NEURONS = 1;
@@ -46,26 +43,26 @@ namespace UnsupervisedTraining
             Evals = new double[pop];
             _activationFunction = new TanhActivationFunction();
             _summationFunction = new SimpleSummation();
-            NetsForGeneration = new NeuralNetwork[pop];
+            //NetsForGeneration = new NeuralNetwork[pop];
             _sessions = new List<TrainingSession>();
             _networkFactory = NeuralNetworkFactory.GetInstance(SomaFactory.GetInstance(_summationFunction), AxonFactory.GetInstance(_activationFunction), SynapseFactory.GetInstance(new RandomWeightInitializer(new Random())), SynapseFactory.GetInstance(new ConstantWeightInitializer(1.0)), new RandomWeightInitializer(new Random()));
             for (int i = 0; i < pop; i++)
             {
                 Evals[i] = -1;
-                NetsForGeneration[i] = _networkFactory.Create(INPUT_NEURONS, OUTPUT_NEURONS, NUM_HIDDEN_LAYERS, HIDDEN_NEURONS);// new NeuralNetwork(INPUT_NEURONS, HIDDEN_NEURONS, OUTPUT_NEURONS, _activationFunction);//TODO: why is this a hardcoded value?
+                //NetsForGeneration[i] = _networkFactory.Create(INPUT_NEURONS, OUTPUT_NEURONS, NUM_HIDDEN_LAYERS, HIDDEN_NEURONS);// new NeuralNetwork(INPUT_NEURONS, HIDDEN_NEURONS, OUTPUT_NEURONS, _activationFunction);//TODO: why is this a hardcoded value?
+                _sessions.Add(new TrainingSession(_networkFactory.Create(INPUT_NEURONS, OUTPUT_NEURONS, NUM_HIDDEN_LAYERS, HIDDEN_NEURONS), new Game(10, 10, 300), i));
             }
             History = new EvalWorkingSet(50);//TODO: why is this a hardcoded value?
-            ObjectLock = new object();
         }
 
         public void RunGeneration()
         {
-            _sessions.Clear();
-            for (int i = 0; i < NetsForGeneration.Length; i++)
-            {
-                _sessions.Add(new TrainingSession(NetsForGeneration[i], new Game(10, 10, 300), i));
+            //_sessions.Clear();
+            //for (int i = 0; i < NetsForGeneration.Length; i++)
+            //{
+            //    _sessions.Add(new TrainingSession(NetsForGeneration[i], new Game(10, 10, 300), i));
 
-            }
+            //}
             if (USE_MULTITHREADING)
             {
                 Parallel.ForEach<TrainingSession>(_sessions, session =>
@@ -159,7 +156,7 @@ namespace UnsupervisedTraining
                     }
                 }
             }
-            return NetsForGeneration[indicesToKeep[0]];
+            return _sessions[indicesToKeep[0]]._nn;
         }
 
         private double getBestEvalOfGeneration()
@@ -271,10 +268,11 @@ namespace UnsupervisedTraining
             allToAdd.AddRange(mutated);
             allToAdd.AddRange(toKeep);
 
-
+            _sessions.Clear();
             for (int net = 0; net < allToAdd.Count; net++)
             {
-                NetsForGeneration[net] = allToAdd[net];
+                //NetsForGeneration[net] = allToAdd[net];
+                _sessions.Add(new TrainingSession(allToAdd[net], new Game(10, 10, 300), net));
             }
 
         }
@@ -296,7 +294,7 @@ namespace UnsupervisedTraining
             List<INeuralNetwork> toKeep = new List<INeuralNetwork>();
             for (int i = 0; i < indicesToKeep.Length; i++)
             {
-                INeuralNetwork goodPerformer = NetsForGeneration[indicesToKeep[i]];
+                INeuralNetwork goodPerformer = _sessions[indicesToKeep[i]]._nn;
                 toKeep.Add(goodPerformer);
             }
             return toKeep;
@@ -312,7 +310,7 @@ namespace UnsupervisedTraining
             while (numMutated < numToMutate)
             {
                 int i = new Random().Next(indicesToKeep.Length);
-                INeuralNetwork goodPerformer = NetsForGeneration[indicesToKeep[i]];
+                INeuralNetwork goodPerformer = _sessions[indicesToKeep[i]]._nn;
                 NeuralNetworkGene childGenes = goodPerformer.GetGenes();
 
                 for (int n = 0; n < childGenes.InputGene.Neurons.Count; n++)
@@ -424,12 +422,12 @@ namespace UnsupervisedTraining
                 // choose mother
                 WeightedIndex index1 = chooseIndex(toChooseFrom);
                 toChooseFrom.Remove(index1);
-                INeuralNetwork mother = NetsForGeneration[index1.Index];
+                INeuralNetwork mother = _sessions[index1.Index]._nn;
 
                 // choose father
                 WeightedIndex index2 = chooseIndex(toChooseFrom);
                 toChooseFrom.Remove(index2);
-                INeuralNetwork father = NetsForGeneration[index2.Index];
+                INeuralNetwork father = _sessions[index2.Index]._nn;
 
                 INeuralNetwork child = mate(mother, father);
                 children.Add(child);
