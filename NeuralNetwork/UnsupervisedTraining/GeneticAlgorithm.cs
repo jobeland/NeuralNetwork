@@ -27,18 +27,16 @@ namespace UnsupervisedTraining
         private readonly ISummationFunction _summationFunction;
         public static double MUTATE_CHANCE = 0.05;
 
+        private readonly NeuralNetworkConfigurationSettings _networkConfig;
 
-        private static int INPUT_NEURONS = 1;
-        private static int HIDDEN_NEURONS = 3;
-        private static int NUM_HIDDEN_LAYERS = 1;
-        private static int OUTPUT_NEURONS = 1;
         private static bool USE_MULTITHREADING = true;
 
         private static double HIGH_MUTATION = 0.5;
         private static double NORMAL_MUTATION = 0.05;
 
-        public GeneticAlgorithm(int pop)
+        public GeneticAlgorithm(int pop, NeuralNetworkConfigurationSettings networkConfig)
         {
+            _networkConfig = networkConfig;
             this.Population = pop;
             Evals = new double[pop];
             _activationFunction = new TanhActivationFunction();
@@ -50,7 +48,7 @@ namespace UnsupervisedTraining
             {
                 Evals[i] = -1;
                 //NetsForGeneration[i] = _networkFactory.Create(INPUT_NEURONS, OUTPUT_NEURONS, NUM_HIDDEN_LAYERS, HIDDEN_NEURONS);// new NeuralNetwork(INPUT_NEURONS, HIDDEN_NEURONS, OUTPUT_NEURONS, _activationFunction);//TODO: why is this a hardcoded value?
-                _sessions.Add(new TrainingSession(_networkFactory.Create(INPUT_NEURONS, OUTPUT_NEURONS, NUM_HIDDEN_LAYERS, HIDDEN_NEURONS), new Game(10, 10, 300), i));
+                _sessions.Add(new TrainingSession(_networkFactory.Create(_networkConfig.NumInputNeurons, _networkConfig.NumOutputNeurons, _networkConfig.NumHiddenLayers, _networkConfig.NumHiddenNeurons), new Game(10, 10, 300), i));
             }
             History = new EvalWorkingSet(50);//TODO: why is this a hardcoded value?
         }
@@ -283,7 +281,7 @@ namespace UnsupervisedTraining
             List<INeuralNetwork> newNets = new List<INeuralNetwork>();
             for (int i = 0; i < numToGen; i++)
             {
-                INeuralNetwork newNet = _networkFactory.Create(INPUT_NEURONS, OUTPUT_NEURONS, NUM_HIDDEN_LAYERS, HIDDEN_NEURONS);
+                INeuralNetwork newNet = _networkFactory.Create(_networkConfig.NumInputNeurons, _networkConfig.NumOutputNeurons, _networkConfig.NumHiddenLayers, _networkConfig.NumHiddenNeurons);
                 newNets.Add(newNet);
             }
             return newNets;
