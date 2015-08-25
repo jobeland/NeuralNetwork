@@ -13,5 +13,6 @@ namespace UnsupervisedTraining
         public double HighMutationRate { get; set; }
         public int GenerationPopulation { get; set; }
         public int GenerationsPerEpoch { get; set; }
+        public int NumEpochs { get; set; }
     }
 }

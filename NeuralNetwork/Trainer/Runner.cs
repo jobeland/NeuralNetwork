@@ -28,7 +28,8 @@ namespace Trainer
                 NormalMutationRate = 0.05,
                 HighMutationRate = 0.5,
                 GenerationsPerEpoch = 100,
-                GenerationPopulation = 1000
+                GenerationPopulation = 1000,
+                NumEpochs = 1000
             };
             GeneticAlgorithm evolver = new GeneticAlgorithm(networkConfig, GASettings);
             evolver.runEpoch();

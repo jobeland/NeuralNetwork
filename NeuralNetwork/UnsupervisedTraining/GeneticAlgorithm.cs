@@ -23,8 +23,6 @@ namespace UnsupervisedTraining
         public EvalWorkingSet History { get; set; }
         public IList<TrainingSession> _sessions { get; set; }
         
-        
-
         private readonly NeuralNetworkConfigurationSettings _networkConfig;
         private readonly GeneticAlgorithmConfigurationSettings _geneticConfig;
 
@@ -50,12 +48,6 @@ namespace UnsupervisedTraining
 
         public void RunGeneration()
         {
-            //_sessions.Clear();
-            //for (int i = 0; i < NetsForGeneration.Length; i++)
-            //{
-            //    _sessions.Add(new TrainingSession(NetsForGeneration[i], new Game(10, 10, 300), i));
-
-            //}
             if (_geneticConfig.UseMultithreading)
             {
                 Parallel.ForEach<TrainingSession>(_sessions, session =>
@@ -84,7 +76,7 @@ namespace UnsupervisedTraining
 
         public void runEpoch()
         {
-            for (int epoch = 0; epoch < 1000; epoch++)
+            for (int epoch = 0; epoch < _geneticConfig.NumEpochs; epoch++)
             {
                 for (int generation = 0; generation < _geneticConfig.GenerationsPerEpoch; generation++)
                 {
@@ -100,15 +92,8 @@ namespace UnsupervisedTraining
                     }
                     LoggerFactory.GetLogger().Log(LogLevel.Info, string.Format("count: {0}", count));
 
-
-
                     createNextGeneration();
                     LoggerFactory.GetLogger().Log(LogLevel.Info, string.Format("Epoch: {0},  Generation: {1}", epoch, generation));
-
-                    //				 if(generation % 100 == 0){
-                    //					 NeuralNetwork bestPerformer = getBestPerformer();
-                    //						NNUtils.saveNetwork(bestPerformer);
-                    //				 }
 
                 }
 
