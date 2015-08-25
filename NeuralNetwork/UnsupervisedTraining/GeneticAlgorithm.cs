@@ -16,18 +16,15 @@ namespace UnsupervisedTraining
 
     public class GeneticAlgorithm
     {
-
-        
-        public double[] Evals { get; set; }
         private INeuralNetworkFactory _networkFactory;
         public EvalWorkingSet History { get; set; }
-        public IList<TrainingSession> _sessions { get; set; }
         
         private readonly NeuralNetworkConfigurationSettings _networkConfig;
         private readonly GenerationConfigurationSettings _generationConfig;
         private readonly EvolutionConfigurationSettings _evolutionConfig;
 
         private double _mutateChance;
+        private Generation _generation;
        
 
         public GeneticAlgorithm(NeuralNetworkConfigurationSettings networkConfig, GenerationConfigurationSettings generationConfig, EvolutionConfigurationSettings evolutionConfig)
@@ -35,46 +32,17 @@ namespace UnsupervisedTraining
             _networkConfig = networkConfig;
             _generationConfig = generationConfig;
             _evolutionConfig = evolutionConfig;
-            Evals = new double[_generationConfig.GenerationPopulation];
             //NetsForGeneration = new NeuralNetwork[pop];
-            _sessions = new List<TrainingSession>();
+            var sessions = new List<TrainingSession>();
             _networkFactory = NeuralNetworkFactory.GetInstance(SomaFactory.GetInstance(_networkConfig.SummationFunction), AxonFactory.GetInstance(_networkConfig.ActivationFunction), SynapseFactory.GetInstance(new RandomWeightInitializer(new Random())), SynapseFactory.GetInstance(new ConstantWeightInitializer(1.0)), new RandomWeightInitializer(new Random()));
             for (int i = 0; i < _generationConfig.GenerationPopulation; i++)
             {
-                Evals[i] = -1;
                 //NetsForGeneration[i] = _networkFactory.Create(INPUT_NEURONS, OUTPUT_NEURONS, NUM_HIDDEN_LAYERS, HIDDEN_NEURONS);// new NeuralNetwork(INPUT_NEURONS, HIDDEN_NEURONS, OUTPUT_NEURONS, _activationFunction);//TODO: why is this a hardcoded value?
-                _sessions.Add(new TrainingSession(_networkFactory.Create(_networkConfig.NumInputNeurons, _networkConfig.NumOutputNeurons, _networkConfig.NumHiddenLayers, _networkConfig.NumHiddenNeurons), new Game(10, 10, 300), i));
+                sessions.Add(new TrainingSession(_networkFactory.Create(_networkConfig.NumInputNeurons, _networkConfig.NumOutputNeurons, _networkConfig.NumHiddenLayers, _networkConfig.NumHiddenNeurons), new Game(10, 10, 300), i));
             }
+            _generation = new Generation(sessions, _generationConfig);
             History = new EvalWorkingSet(50);//TODO: why is this a hardcoded value?
         }
-
-        public void RunGeneration()
-        {
-            if (_generationConfig.UseMultithreading)
-            {
-                Parallel.ForEach<TrainingSession>(_sessions, session =>
-                    {
-                        session.Run();
-                    });
-            }
-            else
-            {
-                foreach (var session in _sessions)
-                {
-                    session.Run();
-                }
-            }
-        }
-
-        public void GetEvalsForGeneration()
-        {
-            //TODO: this shouldn't be in Evals anymore, but just called directly off of the training session
-            for (int i = 0; i < _sessions.Count; i++)
-            {
-                Evals[i] = _sessions[i].GetSessionEvaluation();
-            }
-        }
-
 
         public void runEpoch()
         {
@@ -82,15 +50,16 @@ namespace UnsupervisedTraining
             {
                 for (int generation = 0; generation < _evolutionConfig.GenerationsPerEpoch; generation++)
                 {
-                    RunGeneration();
 
-                    GetEvalsForGeneration();
+                    _generation.Run();
+
+                    var evals = _generation.GetEvalsForGeneration();
 
                     int count = 0;
-                    for (int i = 0; i < Evals.Length; i++)
+                    for (int i = 0; i < evals.Length; i++)
                     {
                         count++;
-                        LoggerFactory.GetLogger().Log(LogLevel.Info, string.Format("eval: {0}", Evals[i]));
+                        LoggerFactory.GetLogger().Log(LogLevel.Info, string.Format("eval: {0}", evals[i]));
                     }
                     LoggerFactory.GetLogger().Log(LogLevel.Info, string.Format("count: {0}", count));
 
@@ -104,69 +73,9 @@ namespace UnsupervisedTraining
 
         internal void SaveBestPerformer(int epoch)
         {
-            INeuralNetwork bestPerformer = getBestPerformer();
+            TrainingSession bestPerformer = _generation.GetBestPerformer();
             var saver = new NeuralNetworkSaver("\\networks");
-            saver.SaveNeuralNetwork(bestPerformer, getBestEvalOfGeneration(), epoch);
-        }
-
-        private INeuralNetwork getBestPerformer()
-        {
-            int numberOfTopPerformersToChoose = (int)(_generationConfig.GenerationPopulation * 0.50);
-            int[] indicesToKeep = new int[numberOfTopPerformersToChoose];
-            for (int i = 0; i < numberOfTopPerformersToChoose; i++)
-            {
-                indicesToKeep[i] = i;
-            }
-            for (int performer = 0; performer < Evals.Length; performer++)
-            {
-                double value = Evals[performer];
-                for (int i = 0; i < indicesToKeep.Length; i++)
-                {
-                    if (value > Evals[indicesToKeep[i]])
-                    {
-                        int newIndex = performer;
-                        // need to shift all of the rest down now
-                        for (int indexContinued = i; indexContinued < numberOfTopPerformersToChoose; indexContinued++)
-                        {
-                            int oldIndex = indicesToKeep[indexContinued];
-                            indicesToKeep[indexContinued] = newIndex;
-                            newIndex = oldIndex;
-                        }
-                        break;
-                    }
-                }
-            }
-            return _sessions[indicesToKeep[0]]._nn;
-        }
-
-        private double getBestEvalOfGeneration()
-        {
-            int numberOfTopPerformersToChoose = (int)(_generationConfig.GenerationPopulation * 0.50);
-            int[] indicesToKeep = new int[numberOfTopPerformersToChoose];
-            for (int i = 0; i < numberOfTopPerformersToChoose; i++)
-            {
-                indicesToKeep[i] = i;
-            }
-            for (int performer = 0; performer < Evals.Length; performer++)
-            {
-                double value = Evals[performer];
-                for (int i = 0; i < indicesToKeep.Length; i++)
-                {
-                    if (value > Evals[indicesToKeep[i]])
-                    {
-                        int newIndex = performer;
-                        // need to shift all of the rest down now
-                        for (int indexContinued = i; indexContinued < numberOfTopPerformersToChoose; indexContinued++)
-                        {
-                            int oldIndex = indicesToKeep[indexContinued];
-                            indicesToKeep[indexContinued] = newIndex;
-                            newIndex = oldIndex;
-                        }
-                        break;
-                    }
-                }
-            }
-            return Evals[indicesToKeep[0]];
+            saver.SaveNeuralNetwork(bestPerformer._nn, bestPerformer.GetSessionEvaluation(), epoch);
         }
 
         private void createNextGeneration()
@@ -197,12 +106,13 @@ namespace UnsupervisedTraining
             {
                 indicesToKeep[i] = i;
             }
-            for (int performer = 0; performer < Evals.Length; performer++)
+            var evals = _generation.GetEvalsForGeneration();
+            for (int performer = 0; performer < evals.Length; performer++)
             {
-                double value = Evals[performer];
+                double value = evals[performer];
                 for (int i = 0; i < indicesToKeep.Length; i++)
                 {
-                    if (value > Evals[indicesToKeep[i]])
+                    if (value > evals[indicesToKeep[i]])
                     {
                         int newIndex = performer;
                         // need to shift all of the rest down now
@@ -217,16 +127,8 @@ namespace UnsupervisedTraining
                 }
             }
 
-            //for(int i = indicesToKeep.Length -1; i >= 0 ; i--){
-            //Console.WriteLine("eval: " + Evals[indicesToKeep[i]]);
-            //}
-            //		 Console.WriteLine("eval: " + evals[indicesToKeep[0]]);
+            History.AddEval(evals[indicesToKeep[0]]);
 
-            History.AddEval(Evals[indicesToKeep[0]]);
-            //		 if(evals[indicesToKeep[0]] >= 100 && !savedAtleastOne){
-            //			 NNUtils.saveNetwork(netsForGeneration[indicesToKeep[0]], "TANHHidden4" + "Eval" + evals[indicesToKeep[0]]);
-            //			 savedAtleastOne = true;
-            //		 }
             if (History.IsStale())
             {
                 _mutateChance = _evolutionConfig.HighMutationRate;
@@ -248,12 +150,12 @@ namespace UnsupervisedTraining
             allToAdd.AddRange(mutated);
             allToAdd.AddRange(toKeep);
 
-            _sessions.Clear();
+            var sessions = new List<TrainingSession>();
             for (int net = 0; net < allToAdd.Count; net++)
             {
-                //NetsForGeneration[net] = allToAdd[net];
-                _sessions.Add(new TrainingSession(allToAdd[net], new Game(10, 10, 300), net));
+                sessions.Add(new TrainingSession(allToAdd[net], new Game(10, 10, 300), net));
             }
+            _generation = new Generation(sessions, _generationConfig);
 
         }
 
@@ -274,7 +176,7 @@ namespace UnsupervisedTraining
             List<INeuralNetwork> toKeep = new List<INeuralNetwork>();
             for (int i = 0; i < indicesToKeep.Length; i++)
             {
-                INeuralNetwork goodPerformer = _sessions[indicesToKeep[i]]._nn;
+                INeuralNetwork goodPerformer = _generation._sessions[indicesToKeep[i]]._nn;
                 toKeep.Add(goodPerformer);
             }
             return toKeep;
@@ -289,7 +191,7 @@ namespace UnsupervisedTraining
             while (numMutated < numToMutate)
             {
                 int i = random.Next(indicesToKeep.Length);
-                INeuralNetwork goodPerformer = _sessions[indicesToKeep[i]]._nn;
+                INeuralNetwork goodPerformer = _generation._sessions[indicesToKeep[i]]._nn;
                 NeuralNetworkGene childGenes = goodPerformer.GetGenes();
 
                 for (int n = 0; n < childGenes.InputGene.Neurons.Count; n++)
@@ -363,10 +265,11 @@ namespace UnsupervisedTraining
         private List<INeuralNetwork> breed(int[] indicesToKeep)
         {
             int numToBreed = (int)(_generationConfig.GenerationPopulation * 0.3);
+            var evals = _generation.GetEvalsForGeneration();
             double sumOfAllEvals = 0;
             for (int i = 0; i < indicesToKeep.Length; i++)
             {
-                sumOfAllEvals += Evals[indicesToKeep[i]];
+                sumOfAllEvals += evals[indicesToKeep[i]];
             }
             if (sumOfAllEvals <= 0)
             {
@@ -381,7 +284,7 @@ namespace UnsupervisedTraining
                 for (int i = 0; i < indicesToKeep.Length; i++)
                 {
                     //TODO: this weight determination algorithm should be delegated
-                    double value = Evals[indicesToKeep[i]];
+                    double value = evals[indicesToKeep[i]];
                     double weight = value / sumOfAllEvals;
                     WeightedIndex index = new WeightedIndex
                     {
@@ -401,12 +304,12 @@ namespace UnsupervisedTraining
                 // choose mother
                 WeightedIndex index1 = chooseIndex(toChooseFrom);
                 toChooseFrom.Remove(index1);
-                INeuralNetwork mother = _sessions[index1.Index]._nn;
+                INeuralNetwork mother = _generation._sessions[index1.Index]._nn;
 
                 // choose father
                 WeightedIndex index2 = chooseIndex(toChooseFrom);
                 toChooseFrom.Remove(index2);
-                INeuralNetwork father = _sessions[index2.Index]._nn;
+                INeuralNetwork father = _generation._sessions[index2.Index]._nn;
 
                 INeuralNetwork child = mate(mother, father);
                 children.Add(child);
