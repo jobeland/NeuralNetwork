@@ -46,6 +46,9 @@
   <ItemGroup>
     <Compile Include="EvalWorkingSet.cs" />
     <Compile Include="GeneticAlgorithm.cs" />
+    <Compile Include="INeuralNetworkLoader.cs" />
+    <Compile Include="INeuralNetworkSaver.cs" />
+    <Compile Include="NeuralNetworkLoader.cs" />
     <Compile Include="NeuralNetworkSaver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RandomGenerator.cs" />

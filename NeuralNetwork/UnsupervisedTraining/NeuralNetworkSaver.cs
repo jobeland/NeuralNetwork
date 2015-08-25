@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace UnsupervisedTraining
 {
-    public class NeuralNetworkSaver
+    public class NeuralNetworkSaver : INeuralNetworkSaver
     {
         private readonly string _directory;
 
