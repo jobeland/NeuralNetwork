@@ -23,14 +23,14 @@ namespace UnsupervisedTraining
         private readonly GenerationConfigurationSettings _generationConfig;
         private readonly EvolutionConfigurationSettings _evolutionConfig;
 
-        private readonly Breeder _breeder;
-        private readonly Mutator _mutator;
+        private readonly IBreeder _breeder;
+        private readonly IMutator _mutator;
 
         private double _mutateChance;
         private Generation _generation;
 
 
-        public GeneticAlgorithm(NeuralNetworkConfigurationSettings networkConfig, GenerationConfigurationSettings generationConfig, EvolutionConfigurationSettings evolutionConfig, INeuralNetworkFactory networkFactory, Breeder breeder, Mutator mutator)
+        public GeneticAlgorithm(NeuralNetworkConfigurationSettings networkConfig, GenerationConfigurationSettings generationConfig, EvolutionConfigurationSettings evolutionConfig, INeuralNetworkFactory networkFactory, IBreeder breeder, IMutator mutator)
         {
             _networkConfig = networkConfig;
             _generationConfig = generationConfig;
@@ -124,10 +124,10 @@ namespace UnsupervisedTraining
                 LoggerFactory.GetLogger().Log(LogLevel.Info, "Mutation set to NORMAL");
             }
 
-            List<INeuralNetwork> children = _breeder.Breed(sessions, numToBreed);
-            List<INeuralNetwork> toKeep = sessions.Select(session => session.NeuralNet).ToList();
-            List<INeuralNetwork> mutated = _mutator.Mutate(sessions, numToMutate, _mutateChance);
-            List<INeuralNetwork> newNetworks = getNewNetworks(numToGen);
+            IList<INeuralNetwork> children = _breeder.Breed(sessions, numToBreed);
+            IList<INeuralNetwork> toKeep = sessions.Select(session => session.NeuralNet).ToList();
+            IList<INeuralNetwork> mutated = _mutator.Mutate(sessions, numToMutate, _mutateChance);
+            IList<INeuralNetwork> newNetworks = getNewNetworks(numToGen);
             List<INeuralNetwork> allToAdd = new List<INeuralNetwork>();
             allToAdd.AddRange(newNetworks);
             allToAdd.AddRange(children);

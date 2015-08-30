@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace UnsupervisedTraining
 {
-    public class Mutator
+    public class Mutator : IMutator
     {
         private readonly INeuralNetworkFactory _networkFactory;
 
@@ -18,7 +18,7 @@ namespace UnsupervisedTraining
             _networkFactory = networkFactory;
         }
 
-        public List<INeuralNetwork> Mutate(IList<TrainingSession> sessions, int numToMutate, double mutateChance)
+        public IList<INeuralNetwork> Mutate(IList<TrainingSession> sessions, int numToMutate, double mutateChance)
         {
             int numMutated = 0;
             List<INeuralNetwork> mutated = new List<INeuralNetwork>();

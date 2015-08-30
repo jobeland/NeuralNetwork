@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace UnsupervisedTraining
 {
-    public class Breeder
+    public class Breeder : IBreeder
     {
         private readonly INeuralNetworkFactory _networkFactory;
 
@@ -18,7 +18,7 @@ namespace UnsupervisedTraining
             _networkFactory = networkFactory;
         }
 
-        public List<INeuralNetwork> Breed(IList<TrainingSession> sessions, int numToBreed)
+        public IList<INeuralNetwork> Breed(IList<TrainingSession> sessions, int numToBreed)
         {
             WeightedSessionList weightedSessions = new WeightedSessionList(sessions);
             List<INeuralNetwork> children = new List<INeuralNetwork>();
