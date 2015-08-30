@@ -15,12 +15,16 @@ namespace UnsupervisedTraining
         private int _sessionNumber;
         public readonly INeuralNetwork NeuralNet;
         private Game _game;
+        private bool _hasStoredSessionEval;
+        private double _sessionEval;
 
         public TrainingSession(INeuralNetwork nn, Game game, int sessionNumber)
         {
             NeuralNet = nn;
             _game = game;
             _sessionNumber = sessionNumber;
+            _hasStoredSessionEval = false;
+            _sessionEval = 0;
         }
 
         public void Run()
@@ -85,8 +89,16 @@ namespace UnsupervisedTraining
             {
                 throw new NotSupportedException("GetSessionEvaluation is not supported when game is not finished");
             }
-            double result = _game.MovesLeft + (_game.Width * _game.Length) - _game.GetDotsLeft();
-            return result;
+            if (_hasStoredSessionEval)
+            {
+                return _sessionEval;
+            }
+            else
+            {
+                _sessionEval = _game.MovesLeft + (_game.Width * _game.Length) - _game.GetDotsLeft();
+                _hasStoredSessionEval = true;
+            }
+            return _sessionEval;
         }
 
 
