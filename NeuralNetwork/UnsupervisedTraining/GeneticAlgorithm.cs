@@ -35,7 +35,7 @@ namespace UnsupervisedTraining
             _networkConfig = networkConfig;
             _generationConfig = generationConfig;
             _evolutionConfig = evolutionConfig;
-            var sessions = new List<TrainingSession>();
+            var sessions = new List<ITrainingSession>();
             _networkFactory = networkFactory;
             for (int i = 0; i < _generationConfig.GenerationPopulation; i++)
             {
@@ -77,7 +77,7 @@ namespace UnsupervisedTraining
 
         internal void SaveBestPerformer(int epoch)
         {
-            TrainingSession bestPerformer = _generation.GetBestPerformer();
+            ITrainingSession bestPerformer = _generation.GetBestPerformer();
             var saver = new NeuralNetworkSaver("\\networks");
             saver.SaveNeuralNetwork(bestPerformer.NeuralNet, bestPerformer.GetSessionEvaluation(), epoch);
         }
@@ -134,7 +134,7 @@ namespace UnsupervisedTraining
             allToAdd.AddRange(mutated);
             allToAdd.AddRange(toKeep);
 
-            var newSessions = new List<TrainingSession>();
+            var newSessions = new List<ITrainingSession>();
             for (int net = 0; net < allToAdd.Count; net++)
             {
                 newSessions.Add(new TrainingSession(allToAdd[net], new Game(10, 10, 300), net));

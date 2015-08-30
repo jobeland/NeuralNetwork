@@ -54,6 +54,7 @@
     <Compile Include="IMutator.cs" />
     <Compile Include="INeuralNetworkLoader.cs" />
     <Compile Include="INeuralNetworkSaver.cs" />
+    <Compile Include="ITrainingSession.cs" />
     <Compile Include="Mutator.cs" />
     <Compile Include="NeuralNetworkConfigurationSettings.cs" />
     <Compile Include="NeuralNetworkLoader.cs" />

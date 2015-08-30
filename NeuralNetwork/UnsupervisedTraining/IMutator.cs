@@ -5,6 +5,6 @@ namespace UnsupervisedTraining
 {
     public interface IMutator
     {
-        IList<INeuralNetwork> Mutate(IList<TrainingSession> sessions, int numToMutate, double mutateChance);
+        IList<INeuralNetwork> Mutate(IList<ITrainingSession> sessions, int numToMutate, double mutateChance);
     }
 }

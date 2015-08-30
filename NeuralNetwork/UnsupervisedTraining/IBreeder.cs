@@ -5,6 +5,6 @@ namespace UnsupervisedTraining
 {
     public interface IBreeder
     {
-        IList<INeuralNetwork> Breed(IList<TrainingSession> sessions, int numToBreed);
+        IList<INeuralNetwork> Breed(IList<ITrainingSession> sessions, int numToBreed);
     }
 }

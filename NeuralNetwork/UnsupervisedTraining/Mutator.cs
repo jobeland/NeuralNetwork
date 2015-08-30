@@ -18,7 +18,7 @@ namespace UnsupervisedTraining
             _networkFactory = networkFactory;
         }
 
-        public IList<INeuralNetwork> Mutate(IList<TrainingSession> sessions, int numToMutate, double mutateChance)
+        public IList<INeuralNetwork> Mutate(IList<ITrainingSession> sessions, int numToMutate, double mutateChance)
         {
             int numMutated = 0;
             List<INeuralNetwork> mutated = new List<INeuralNetwork>();

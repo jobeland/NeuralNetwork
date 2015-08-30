@@ -10,7 +10,7 @@ namespace UnsupervisedTraining
     {
         private IList<WeightedSession> _sessions;
 
-        public WeightedSessionList(IList<TrainingSession> sessions)
+        public WeightedSessionList(IList<ITrainingSession> sessions)
         {
             double sumOfAllEvals = 0;
             for (int i = 0; i < sessions.Count; i++)
@@ -46,7 +46,7 @@ namespace UnsupervisedTraining
             _sessions = toChooseFrom;
         }
 
-        public TrainingSession ChooseRandomWeightedSession()
+        public ITrainingSession ChooseRandomWeightedSession()
         {
             double value = RandomGenerator.GetInstance().NextDouble() * _sessions[_sessions.Count - 1].CumlativeWeight;
             //Failsafe for odd case when value is very low. Needs a more permanent fix so as not to skew the selection towards lower, however slight           

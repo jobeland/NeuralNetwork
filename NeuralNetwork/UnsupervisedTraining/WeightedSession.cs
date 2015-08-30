@@ -8,7 +8,7 @@ namespace UnsupervisedTraining
 {
     public class WeightedSession
     {
-        public TrainingSession Session;
+        public ITrainingSession Session;
         public double Weight;
         public double CumlativeWeight;
 

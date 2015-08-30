@@ -10,10 +10,10 @@ namespace UnsupervisedTraining
     public class Generation
     {
         public double[] Evals { get; set; }
-        private IList<TrainingSession> _sessions;
+        private IList<ITrainingSession> _sessions;
         private readonly GenerationConfigurationSettings _generationConfig;
 
-        public Generation(IList<TrainingSession> population, GenerationConfigurationSettings generationConfig)
+        public Generation(IList<ITrainingSession> population, GenerationConfigurationSettings generationConfig)
         {
             _sessions = population;
             _generationConfig = generationConfig;
@@ -23,7 +23,7 @@ namespace UnsupervisedTraining
         {
             if (_generationConfig.UseMultithreading)
             {
-                Parallel.ForEach<TrainingSession>(_sessions, session =>
+                Parallel.ForEach<ITrainingSession>(_sessions, session =>
                 {
                     session.Run();
                 });
@@ -56,7 +56,7 @@ namespace UnsupervisedTraining
             return toReturn;
         }
 
-        public TrainingSession GetBestPerformer()
+        public ITrainingSession GetBestPerformer()
         {
             int indexToKeep = 0;
             for (int performer = 0; performer < Evals.Length; performer++)
@@ -70,7 +70,7 @@ namespace UnsupervisedTraining
             return _sessions[indexToKeep];
         }
 
-        public IList<TrainingSession> GetBestPerformers(int numPerformers)
+        public IList<ITrainingSession> GetBestPerformers(int numPerformers)
         {
             if (numPerformers <= 0)
             {
@@ -107,7 +107,7 @@ namespace UnsupervisedTraining
                 }
             }
 
-            var sessionsToReturn = new List<TrainingSession>();
+            var sessionsToReturn = new List<ITrainingSession>();
             for (int i = 0; i < numPerformers; i++)
             {
                 sessionsToReturn.Add(_sessions[indicesToKeep[i]]);

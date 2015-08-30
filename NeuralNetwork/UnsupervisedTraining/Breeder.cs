@@ -18,18 +18,18 @@ namespace UnsupervisedTraining
             _networkFactory = networkFactory;
         }
 
-        public IList<INeuralNetwork> Breed(IList<TrainingSession> sessions, int numToBreed)
+        public IList<INeuralNetwork> Breed(IList<ITrainingSession> sessions, int numToBreed)
         {
             WeightedSessionList weightedSessions = new WeightedSessionList(sessions);
             List<INeuralNetwork> children = new List<INeuralNetwork>();
             for (int bred = 0; bred < numToBreed; bred++)
             {
                 // choose mother
-                TrainingSession session1 = weightedSessions.ChooseRandomWeightedSession();
+                ITrainingSession session1 = weightedSessions.ChooseRandomWeightedSession();
                 INeuralNetwork mother = session1.NeuralNet;
 
                 // choose father
-                TrainingSession session2 = weightedSessions.ChooseRandomWeightedSession();
+                ITrainingSession session2 = weightedSessions.ChooseRandomWeightedSession();
                 INeuralNetwork father = session2.NeuralNet;
 
                 INeuralNetwork child = mate(mother, father);

@@ -10,10 +10,10 @@ using Logging;
 namespace UnsupervisedTraining
 {
 
-    public class TrainingSession
+    public class TrainingSession : ITrainingSession
     {
         private int _sessionNumber;
-        public readonly INeuralNetwork NeuralNet;
+        public INeuralNetwork NeuralNet { get; set; }
         private Game _game;
         private bool _hasStoredSessionEval;
         private double _sessionEval;
