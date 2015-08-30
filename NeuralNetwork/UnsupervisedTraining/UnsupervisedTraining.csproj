@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Breeder.cs" />
     <Compile Include="EvalWorkingSet.cs" />
     <Compile Include="EvolutionConfigurationSettings.cs" />
     <Compile Include="Generation.cs" />

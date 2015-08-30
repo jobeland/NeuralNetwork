@@ -23,22 +23,26 @@ namespace UnsupervisedTraining
         private readonly GenerationConfigurationSettings _generationConfig;
         private readonly EvolutionConfigurationSettings _evolutionConfig;
 
+        private readonly Breeder _breeder;
+
         private double _mutateChance;
         private Generation _generation;
 
 
-        public GeneticAlgorithm(NeuralNetworkConfigurationSettings networkConfig, GenerationConfigurationSettings generationConfig, EvolutionConfigurationSettings evolutionConfig)
+        public GeneticAlgorithm(NeuralNetworkConfigurationSettings networkConfig, GenerationConfigurationSettings generationConfig, EvolutionConfigurationSettings evolutionConfig, INeuralNetworkFactory networkFactory, Breeder breeder)
         {
             _networkConfig = networkConfig;
             _generationConfig = generationConfig;
             _evolutionConfig = evolutionConfig;
             var sessions = new List<TrainingSession>();
-            _networkFactory = NeuralNetworkFactory.GetInstance(SomaFactory.GetInstance(_networkConfig.SummationFunction), AxonFactory.GetInstance(_networkConfig.ActivationFunction), SynapseFactory.GetInstance(new RandomWeightInitializer(new Random())), SynapseFactory.GetInstance(new ConstantWeightInitializer(1.0)), new RandomWeightInitializer(new Random()));
+            _networkFactory = networkFactory;
             for (int i = 0; i < _generationConfig.GenerationPopulation; i++)
             {
                 sessions.Add(new TrainingSession(_networkFactory.Create(_networkConfig.NumInputNeurons, _networkConfig.NumOutputNeurons, _networkConfig.NumHiddenLayers, _networkConfig.NumHiddenNeurons), new Game(10, 10, 300), i));
             }
             _generation = new Generation(sessions, _generationConfig);
+
+            _breeder = breeder;
             History = new EvalWorkingSet(50);//TODO: why is this a hardcoded value?
         }
 
@@ -118,7 +122,7 @@ namespace UnsupervisedTraining
                 LoggerFactory.GetLogger().Log(LogLevel.Info, "Mutation set to NORMAL");
             }
 
-            List<INeuralNetwork> children = breed(sessions, numToBreed);
+            List<INeuralNetwork> children = _breeder.Breed(sessions, numToBreed);
             List<INeuralNetwork> toKeep = sessions.Select(session => session.NeuralNet).ToList();
             List<INeuralNetwork> mutated = mutate(sessions, numToMutate);
             List<INeuralNetwork> newSpecies = getNewNetworks(numToGen);
@@ -147,17 +151,6 @@ namespace UnsupervisedTraining
             }
             return newNets;
         }
-
-        //private List<INeuralNetwork> keep(int[] indicesToKeep)
-        //{
-        //    List<INeuralNetwork> toKeep = new List<INeuralNetwork>();
-        //    for (int i = 0; i < indicesToKeep.Length; i++)
-        //    {
-        //        INeuralNetwork goodPerformer = _generation._sessions[indicesToKeep[i]].NeuralNet;
-        //        toKeep.Add(goodPerformer);
-        //    }
-        //    return toKeep;
-        //}
 
         private List<INeuralNetwork> mutate(IList<TrainingSession> sessions, int numToMutate)
         {
@@ -238,109 +231,7 @@ namespace UnsupervisedTraining
             return gene;
         }
 
-        private List<INeuralNetwork> breed(IList<TrainingSession> sessions, int numToBreed)
-        {
-            WeightedSessionList weightedSessions = new WeightedSessionList(sessions);
-            List<INeuralNetwork> children = new List<INeuralNetwork>();
-            for (int bred = 0; bred < numToBreed; bred++)
-            {
-                // choose mother
-                TrainingSession session1 = weightedSessions.ChooseRandomWeightedSession();
-                INeuralNetwork mother = session1.NeuralNet;
-
-                // choose father
-                TrainingSession session2 = weightedSessions.ChooseRandomWeightedSession();
-                INeuralNetwork father = session2.NeuralNet;
-
-                INeuralNetwork child = mate(mother, father);
-                children.Add(child);
-            }
-
-            return children;
-
-        }
-
-        private INeuralNetwork mate(INeuralNetwork mother, INeuralNetwork father)
-        {
-            NeuralNetworkGene motherGenes = mother.GetGenes();
-            NeuralNetworkGene childFatherGenes = father.GetGenes();
-            Random random = new Random();
-
-            for (int n = 0; n < childFatherGenes.InputGene.Neurons.Count; n++)
-            {
-                var neuron = childFatherGenes.InputGene.Neurons[n];
-                var motherNeuron = motherGenes.InputGene.Neurons[n];
-                childFatherGenes.InputGene.Neurons[n] = BreedNeuron(neuron, motherNeuron, random);
-            }
-
-            for (int h = 0; h < childFatherGenes.HiddenGenes.Count; h++)
-            {
-                for (int j = 0; j < childFatherGenes.HiddenGenes[h].Neurons.Count; j++)
-                {
-                    var neuron = childFatherGenes.HiddenGenes[h].Neurons[j];
-                    var motherNeuron = motherGenes.HiddenGenes[h].Neurons[j];
-                    childFatherGenes.HiddenGenes[h].Neurons[j] = BreedNeuron(neuron, motherNeuron, random);
-                }
-            }
-
-            for (int n = 0; n < childFatherGenes.OutputGene.Neurons.Count; n++)
-            {
-                var neuron = childFatherGenes.OutputGene.Neurons[n];
-                var motherNeuron = motherGenes.OutputGene.Neurons[n];
-                childFatherGenes.OutputGene.Neurons[n] = BreedNeuron(neuron, motherNeuron, random);
-            }
-
-            INeuralNetwork child = _networkFactory.Create(childFatherGenes);
-            return child;
-        }
-
-        internal NeuronGene BreedNeuron(NeuronGene father, NeuronGene mother, Random random)
-        {
-            NeuronGene toReturn = new NeuronGene
-            {
-                Axon = new AxonGene
-                {
-                    Weights = new List<double>()
-                },
-                Soma = new SomaGene()
-            };
-            for (int j = 0; j < father.Axon.Weights.Count; j++)
-            {
-                if (random.NextDouble() < 0.5)
-                {
-                    toReturn.Axon.Weights.Add(mother.Axon.Weights[j]);
-                }
-                else
-                {
-                    toReturn.Axon.Weights.Add(father.Axon.Weights[j]);
-                }
-            }
-            if (random.NextDouble() < 0.5)
-            {
-                toReturn.Axon.ActivationFunction = mother.Axon.ActivationFunction;
-            }
-            else
-            {
-                toReturn.Axon.ActivationFunction = father.Axon.ActivationFunction;
-            }
-            if (random.NextDouble() < 0.5)
-            {
-                toReturn.Soma.SummationFunction = mother.Soma.SummationFunction;
-            }
-            else
-            {
-                toReturn.Soma.SummationFunction = father.Soma.SummationFunction;
-            }
-            if (random.NextDouble() < 0.5)
-            {
-                toReturn.Soma.Bias = mother.Soma.Bias;
-            }
-            else
-            {
-                toReturn.Soma.Bias = father.Soma.Bias;
-            }
-            return toReturn;
-        }       
+             
     }
 
 }

@@ -1,5 +1,6 @@
 ﻿using ArtificialNeuralNetwork;
 using ArtificialNeuralNetwork.ActivationFunctions;
+using ArtificialNeuralNetwork.Factories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,7 +36,9 @@ namespace Trainer
                 GenerationsPerEpoch = 100,
                 NumEpochs = 1000
             };
-            GeneticAlgorithm evolver = new GeneticAlgorithm(networkConfig, generationSettings, evolutionSettings);
+            INeuralNetworkFactory factory = NeuralNetworkFactory.GetInstance(SomaFactory.GetInstance(networkConfig.SummationFunction), AxonFactory.GetInstance(networkConfig.ActivationFunction), SynapseFactory.GetInstance(new RandomWeightInitializer(new Random())), SynapseFactory.GetInstance(new ConstantWeightInitializer(1.0)), new RandomWeightInitializer(new Random()));
+            Breeder breeder = new Breeder(factory);
+            GeneticAlgorithm evolver = new GeneticAlgorithm(networkConfig, generationSettings, evolutionSettings, factory, breeder);
             evolver.runEpoch();
         }
     }
