@@ -57,7 +57,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RandomGenerator.cs" />
     <Compile Include="TrainingSession.cs" />
-    <Compile Include="WeightedIndex.cs" />
+    <Compile Include="WeightedSession.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BasicGame\BasicGame.csproj">

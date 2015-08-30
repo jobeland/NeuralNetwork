@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace UnsupervisedTraining
 {
-    public class WeightedIndex
+    public class WeightedSession
     {
-        public int Index;
+        public TrainingSession Session;
         public double Weight;
         public double CumlativeWeight;
 

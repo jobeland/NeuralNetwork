@@ -10,7 +10,7 @@ namespace UnsupervisedTraining
     public class Generation
     {
         public double[] Evals { get; set; }
-        public IList<TrainingSession> _sessions { get; set; }
+        private IList<TrainingSession> _sessions;
         private readonly GenerationConfigurationSettings _generationConfig;
 
         public Generation(IList<TrainingSession> population, GenerationConfigurationSettings generationConfig)
@@ -68,6 +68,51 @@ namespace UnsupervisedTraining
                 }
             }
             return _sessions[indexToKeep];
+        }
+
+        public IList<TrainingSession> GetBestPerformers(int numPerformers)
+        {
+            if (numPerformers <= 0)
+            {
+                throw new ArgumentException("x must be greater than zero");
+            }
+            if (numPerformers > _sessions.Count)
+            {
+                throw new ArgumentException("x must be less than number of sesssions");
+            }
+
+            int[] indicesToKeep = new int[numPerformers];
+            for (int i = 0; i < numPerformers; i++)
+            {
+                indicesToKeep[i] = i;
+            }
+            var evals = GetEvalsForGeneration();
+            for (int performer = 0; performer < evals.Length; performer++)
+            {
+                double value = evals[performer];
+                for (int i = 0; i < indicesToKeep.Length; i++)
+                {
+                    if (value > evals[indicesToKeep[i]])
+                    {
+                        int newIndex = performer;
+                        // need to shift all of the rest down now
+                        for (int indexContinued = i; indexContinued < numPerformers; indexContinued++)
+                        {
+                            int oldIndex = indicesToKeep[indexContinued];
+                            indicesToKeep[indexContinued] = newIndex;
+                            newIndex = oldIndex;
+                        }
+                        break;
+                    }
+                }
+            }
+
+            var sessionsToReturn = new List<TrainingSession>();
+            for (int i = 0; i < numPerformers; i++)
+            {
+                sessionsToReturn.Add(_sessions[indicesToKeep[i]]);
+            }
+            return sessionsToReturn;
         }
     }
 }

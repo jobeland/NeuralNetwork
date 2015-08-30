@@ -13,12 +13,12 @@ namespace UnsupervisedTraining
     public class TrainingSession
     {
         private int _sessionNumber;
-        public readonly INeuralNetwork _nn;
+        public readonly INeuralNetwork NeuralNet;
         private Game _game;
 
         public TrainingSession(INeuralNetwork nn, Game game, int sessionNumber)
         {
-            _nn = nn;
+            NeuralNet = nn;
             _game = game;
             _sessionNumber = sessionNumber;
         }
@@ -65,9 +65,9 @@ namespace UnsupervisedTraining
                     foreach (MoveDirection val in values)
                     {
                         double distance = _game.GetDistanceToClosestDot(val, _game.CurrentCoord, new List<Tuple<int, int>>());
-                        _nn.SetInputs(new[] { distance });
-                        _nn.Process();
-                        double probability = _nn.GetOutputs()[0];
+                        NeuralNet.SetInputs(new[] { distance });
+                        NeuralNet.Process();
+                        double probability = NeuralNet.GetOutputs()[0];
                         if (probability > highestProb)
                         {
                             dirToMove = val;
