@@ -105,9 +105,9 @@ namespace UnsupervisedTraining
              */
 
             int numberOfTopPerformersToChoose = (int)(_generationConfig.GenerationPopulation * 0.50);
-            int numToBreed = (int)(_generationConfig.GenerationPopulation * 0.3);
-            int numToMutate = (int)(_generationConfig.GenerationPopulation * 0.1);
-            int numToGen = (int)(_generationConfig.GenerationPopulation * 0.1);
+            int numToBreed = (int)(_generationConfig.GenerationPopulation * 0.35);
+            //int numToMutate = (int)(_generationConfig.GenerationPopulation * 0.1);
+            int numToGen = (int)(_generationConfig.GenerationPopulation * 0.15);
 
             var sessions = _generation.GetBestPerformers(numberOfTopPerformersToChoose);
 
@@ -125,14 +125,26 @@ namespace UnsupervisedTraining
             }
 
             IList<INeuralNetwork> children = _breeder.Breed(sessions, numToBreed);
+            
             IList<INeuralNetwork> toKeep = sessions.Select(session => session.NeuralNet).ToList();
-            IList<INeuralNetwork> mutated = _mutator.Mutate(sessions, numToMutate, _mutateChance);
+            int numToLiveOn = toKeep.Count / 10;
+            IList<INeuralNetwork> liveOn = toKeep.Take(numToLiveOn).ToList();
+            for (int i = 0; i < numToLiveOn; i++)
+            {
+                toKeep.RemoveAt(0);
+            }
             IList<INeuralNetwork> newNetworks = getNewNetworks(numToGen);
+
+            //TODO: need to fix rate of mutation vs num to mutate
+            List<INeuralNetwork> toTryMutate = new List<INeuralNetwork>();
+            toTryMutate.AddRange(toKeep);
+            toTryMutate.AddRange(newNetworks);
+            IList<INeuralNetwork> maybeMutated = _mutator.Mutate(toTryMutate, _mutateChance);
+
             List<INeuralNetwork> allToAdd = new List<INeuralNetwork>();
-            allToAdd.AddRange(newNetworks);
             allToAdd.AddRange(children);
-            allToAdd.AddRange(mutated);
-            allToAdd.AddRange(toKeep);
+            allToAdd.AddRange(maybeMutated);
+            allToAdd.AddRange(liveOn);
 
             var newSessions = new List<ITrainingSession>();
             for (int net = 0; net < allToAdd.Count; net++)

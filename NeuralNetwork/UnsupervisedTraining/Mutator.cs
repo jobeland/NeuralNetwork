@@ -18,16 +18,13 @@ namespace UnsupervisedTraining
             _networkFactory = networkFactory;
         }
 
-        public IList<INeuralNetwork> Mutate(IList<ITrainingSession> sessions, int numToMutate, double mutateChance)
+        public IList<INeuralNetwork> Mutate(IList<INeuralNetwork> networks, double mutateChance)
         {
-            int numMutated = 0;
-            List<INeuralNetwork> mutated = new List<INeuralNetwork>();
+            List<INeuralNetwork> completed = new List<INeuralNetwork>();
             Random random = new Random();
-            while (numMutated < numToMutate)
+            foreach (INeuralNetwork net in networks)
             {
-                int i = random.Next(sessions.Count);
-                INeuralNetwork goodPerformer = sessions[i].NeuralNet;
-                NeuralNetworkGene childGenes = goodPerformer.GetGenes();
+                NeuralNetworkGene childGenes = net.GetGenes();
 
                 for (int n = 0; n < childGenes.InputGene.Neurons.Count; n++)
                 {
@@ -43,10 +40,9 @@ namespace UnsupervisedTraining
                         childGenes.HiddenGenes[h].Neurons[j] = TryMutateNeuron(neuron, random, mutateChance);
                     }
                 }
-                mutated.Add(_networkFactory.Create(childGenes));
-                numMutated++;
+                completed.Add(_networkFactory.Create(childGenes));
             }
-            return mutated;
+            return completed;
         }
 
         internal NeuronGene TryMutateNeuron(NeuronGene gene, Random random, double mutateChance)
