@@ -238,54 +238,18 @@ namespace UnsupervisedTraining
             return gene;
         }
 
-        private IList<WeightedSession> getWeightedSessions(IList<TrainingSession> sessions)
-        {
-            double sumOfAllEvals = 0;
-            for (int i = 0; i < sessions.Count; i++)
-            {
-                sumOfAllEvals += sessions[i].GetSessionEvaluation();
-            }
-            if (sumOfAllEvals <= 0)
-            {
-                sumOfAllEvals = 1;
-            }
-
-            List<WeightedSession> toChooseFrom = new List<WeightedSession>();
-            double cumulative = 0.0;
-            for (int i = 0; i < sessions.Count; i++)
-            {
-                //TODO: this weight determination algorithm should be delegated
-                double value = sessions[i].GetSessionEvaluation();
-                double weight = value / sumOfAllEvals;
-                WeightedSession weightedSession = new WeightedSession
-                {
-                    Session = sessions[i],
-                    Weight = weight,
-                };
-                toChooseFrom.Add(weightedSession);
-            }
-
-            toChooseFrom = toChooseFrom.OrderBy(session => session.Weight).ToList();
-            foreach (WeightedSession session in toChooseFrom)
-            {
-                session.CumlativeWeight = cumulative;
-                cumulative += session.Weight;
-            }
-            return toChooseFrom;
-        }
-
         private List<INeuralNetwork> breed(IList<TrainingSession> sessions, int numToBreed)
         {
-            IList<WeightedSession> weightedSessions = getWeightedSessions(sessions);
+            WeightedSessionList weightedSessions = new WeightedSessionList(sessions);
             List<INeuralNetwork> children = new List<INeuralNetwork>();
             for (int bred = 0; bred < numToBreed; bred++)
             {
                 // choose mother
-                TrainingSession session1 = chooseRandomWeightedSession(weightedSessions).Session;
+                TrainingSession session1 = weightedSessions.ChooseRandomWeightedSession();
                 INeuralNetwork mother = session1.NeuralNet;
 
                 // choose father
-                TrainingSession session2 = chooseRandomWeightedSession(weightedSessions).Session;
+                TrainingSession session2 = weightedSessions.ChooseRandomWeightedSession();
                 INeuralNetwork father = session2.NeuralNet;
 
                 INeuralNetwork child = mate(mother, father);
@@ -376,18 +340,7 @@ namespace UnsupervisedTraining
                 toReturn.Soma.Bias = father.Soma.Bias;
             }
             return toReturn;
-        }
-
-        private WeightedSession chooseRandomWeightedSession(IList<WeightedSession> sessions)
-        {
-            double value = RandomGenerator.GetInstance().NextDouble() * sessions[sessions.Count - 1].CumlativeWeight;
-            //Failsafe for odd case when value is very low. Needs a more permanent fix so as not to skew the selection towards lower, however slight           
-            if (sessions[0].CumlativeWeight > value)
-            {
-                return sessions[0];
-            }
-            return sessions.Last(session => session.CumlativeWeight <= value);
-        }
+        }       
     }
 
 }
