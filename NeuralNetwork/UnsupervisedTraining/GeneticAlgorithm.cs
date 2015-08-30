@@ -126,7 +126,7 @@ namespace UnsupervisedTraining
 
             List<INeuralNetwork> children = _breeder.Breed(sessions, numToBreed);
             List<INeuralNetwork> toKeep = sessions.Select(session => session.NeuralNet).ToList();
-            List<INeuralNetwork> mutated = _mutator.Mutate(sessions, numToMutate);
+            List<INeuralNetwork> mutated = _mutator.Mutate(sessions, numToMutate, _mutateChance);
             List<INeuralNetwork> newNetworks = getNewNetworks(numToGen);
             List<INeuralNetwork> allToAdd = new List<INeuralNetwork>();
             allToAdd.AddRange(newNetworks);

@@ -18,7 +18,7 @@ namespace UnsupervisedTraining
             _networkFactory = networkFactory;
         }
 
-        public List<INeuralNetwork> Mutate(IList<TrainingSession> sessions, int numToMutate)
+        public List<INeuralNetwork> Mutate(IList<TrainingSession> sessions, int numToMutate, double mutateChance)
         {
             int numMutated = 0;
             List<INeuralNetwork> mutated = new List<INeuralNetwork>();
@@ -32,7 +32,7 @@ namespace UnsupervisedTraining
                 for (int n = 0; n < childGenes.InputGene.Neurons.Count; n++)
                 {
                     var neuron = childGenes.InputGene.Neurons[n];
-                    childGenes.InputGene.Neurons[n] = TryMutateNeuron(neuron, random);
+                    childGenes.InputGene.Neurons[n] = TryMutateNeuron(neuron, random, mutateChance);
                 }
 
                 for (int h = 0; h < childGenes.HiddenGenes.Count; h++)
@@ -40,7 +40,7 @@ namespace UnsupervisedTraining
                     for (int j = 0; j < childGenes.HiddenGenes[h].Neurons.Count; j++)
                     {
                         var neuron = childGenes.HiddenGenes[h].Neurons[j];
-                        childGenes.HiddenGenes[h].Neurons[j] = TryMutateNeuron(neuron, random);
+                        childGenes.HiddenGenes[h].Neurons[j] = TryMutateNeuron(neuron, random, mutateChance);
                     }
                 }
                 mutated.Add(_networkFactory.Create(childGenes));
@@ -49,7 +49,7 @@ namespace UnsupervisedTraining
             return mutated;
         }
 
-        internal NeuronGene TryMutateNeuron(NeuronGene gene, Random random)
+        internal NeuronGene TryMutateNeuron(NeuronGene gene, Random random, double mutateChance)
         {
             NeuronGene toReturn = new NeuronGene
             {
@@ -65,7 +65,7 @@ namespace UnsupervisedTraining
             };
             for (int j = 0; j < gene.Axon.Weights.Count; j++)
             {
-                if (random.NextDouble() <= _mutateChance)
+                if (random.NextDouble() <= mutateChance)
                 {
                     double val = random.NextDouble();
                     if (random.NextDouble() < 0.5)
@@ -80,7 +80,7 @@ namespace UnsupervisedTraining
                     toReturn.Axon.Weights.Add(gene.Axon.Weights[j]);
                 }
             }
-            if (random.NextDouble() <= _mutateChance)
+            if (random.NextDouble() <= mutateChance)
             {
                 double val = random.NextDouble();
                 if (random.NextDouble() < 0.5)
