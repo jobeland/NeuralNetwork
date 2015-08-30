@@ -6,31 +6,30 @@ using System.Threading.Tasks;
 
 namespace UnsupervisedTraining
 {
-    public class EvalWorkingSet
+    public class EvalWorkingSet : IEvalWorkingSet
     {
-
-        public LinkedList<Double> PastEvals { get; set; }
-        public int Size { get; set; }
+        private LinkedList<Double> _pastEvals;
+        private int _size;
 
         public EvalWorkingSet(int size)
         {
-            PastEvals = new LinkedList<Double>();
-            PastEvals.AddFirst(0.0);
-            this.Size = size;
+            _pastEvals = new LinkedList<Double>();
+            _pastEvals.AddFirst(0.0);
+            this._size = size;
         }
 
         public void AddEval(double eval)
         {
-            PastEvals.AddFirst(eval);
-            if (PastEvals.Count > this.Size)
+            _pastEvals.AddFirst(eval);
+            if (_pastEvals.Count > this._size)
             {
-                PastEvals.RemoveLast();
+                _pastEvals.RemoveLast();
             }
         }
 
         public bool IsStale()
         {
-            if (PastEvals.First.Value <= PastEvals.Last.Value)
+            if (_pastEvals.First.Value <= _pastEvals.Last.Value)
             {
                 return true;
             }

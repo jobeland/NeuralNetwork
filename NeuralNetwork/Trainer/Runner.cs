@@ -37,10 +37,11 @@ namespace Trainer
                 NumEpochs = 1000
             };
             INeuralNetworkFactory factory = NeuralNetworkFactory.GetInstance(SomaFactory.GetInstance(networkConfig.SummationFunction), AxonFactory.GetInstance(networkConfig.ActivationFunction), SynapseFactory.GetInstance(new RandomWeightInitializer(new Random())), SynapseFactory.GetInstance(new ConstantWeightInitializer(1.0)), new RandomWeightInitializer(new Random()));
-            Breeder breeder = new Breeder(factory);
-            Mutator mutator = new Mutator(factory);
+            IBreeder breeder = new Breeder(factory);
+            IMutator mutator = new Mutator(factory);
+            IEvalWorkingSet history = new EvalWorkingSet(50);
 
-            GeneticAlgorithm evolver = new GeneticAlgorithm(networkConfig, generationSettings, evolutionSettings, factory, breeder, mutator);
+            GeneticAlgorithm evolver = new GeneticAlgorithm(networkConfig, generationSettings, evolutionSettings, factory, breeder, mutator, history);
             evolver.runEpoch();
         }
     }

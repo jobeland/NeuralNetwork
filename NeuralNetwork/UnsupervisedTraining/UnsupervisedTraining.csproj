@@ -51,6 +51,7 @@
     <Compile Include="GeneticAlgorithm.cs" />
     <Compile Include="GenerationConfigurationSettings.cs" />
     <Compile Include="IBreeder.cs" />
+    <Compile Include="IEvalWorkingSet.cs" />
     <Compile Include="IMutator.cs" />
     <Compile Include="INeuralNetworkLoader.cs" />
     <Compile Include="INeuralNetworkSaver.cs" />

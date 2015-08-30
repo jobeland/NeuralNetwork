@@ -17,7 +17,7 @@ namespace UnsupervisedTraining
     public class GeneticAlgorithm
     {
         private INeuralNetworkFactory _networkFactory;
-        public EvalWorkingSet History { get; set; }
+        private readonly IEvalWorkingSet _history;
 
         private readonly NeuralNetworkConfigurationSettings _networkConfig;
         private readonly GenerationConfigurationSettings _generationConfig;
@@ -30,7 +30,7 @@ namespace UnsupervisedTraining
         private Generation _generation;
 
 
-        public GeneticAlgorithm(NeuralNetworkConfigurationSettings networkConfig, GenerationConfigurationSettings generationConfig, EvolutionConfigurationSettings evolutionConfig, INeuralNetworkFactory networkFactory, IBreeder breeder, IMutator mutator)
+        public GeneticAlgorithm(NeuralNetworkConfigurationSettings networkConfig, GenerationConfigurationSettings generationConfig, EvolutionConfigurationSettings evolutionConfig, INeuralNetworkFactory networkFactory, IBreeder breeder, IMutator mutator, IEvalWorkingSet workingSet)
         {
             _networkConfig = networkConfig;
             _generationConfig = generationConfig;
@@ -45,7 +45,7 @@ namespace UnsupervisedTraining
 
             _breeder = breeder;
             _mutator = mutator;
-            History = new EvalWorkingSet(50);//TODO: why is this a hardcoded value?
+            _history = workingSet;
         }
 
         public void runEpoch()
@@ -111,9 +111,9 @@ namespace UnsupervisedTraining
 
             var sessions = _generation.GetBestPerformers(numberOfTopPerformersToChoose);
 
-            History.AddEval(sessions[0].GetSessionEvaluation());
+            _history.AddEval(sessions[0].GetSessionEvaluation());
 
-            if (History.IsStale())
+            if (_history.IsStale())
             {
                 _mutateChance = _evolutionConfig.HighMutationRate;
                 LoggerFactory.GetLogger().Log(LogLevel.Info, "Eval history is stale, setting mutation to HIGH");
