@@ -24,12 +24,13 @@ namespace UnsupervisedTraining
         private readonly EvolutionConfigurationSettings _evolutionConfig;
 
         private readonly Breeder _breeder;
+        private readonly Mutator _mutator;
 
         private double _mutateChance;
         private Generation _generation;
 
 
-        public GeneticAlgorithm(NeuralNetworkConfigurationSettings networkConfig, GenerationConfigurationSettings generationConfig, EvolutionConfigurationSettings evolutionConfig, INeuralNetworkFactory networkFactory, Breeder breeder)
+        public GeneticAlgorithm(NeuralNetworkConfigurationSettings networkConfig, GenerationConfigurationSettings generationConfig, EvolutionConfigurationSettings evolutionConfig, INeuralNetworkFactory networkFactory, Breeder breeder, Mutator mutator)
         {
             _networkConfig = networkConfig;
             _generationConfig = generationConfig;
@@ -43,6 +44,7 @@ namespace UnsupervisedTraining
             _generation = new Generation(sessions, _generationConfig);
 
             _breeder = breeder;
+            _mutator = mutator;
             History = new EvalWorkingSet(50);//TODO: why is this a hardcoded value?
         }
 
@@ -124,10 +126,10 @@ namespace UnsupervisedTraining
 
             List<INeuralNetwork> children = _breeder.Breed(sessions, numToBreed);
             List<INeuralNetwork> toKeep = sessions.Select(session => session.NeuralNet).ToList();
-            List<INeuralNetwork> mutated = mutate(sessions, numToMutate);
-            List<INeuralNetwork> newSpecies = getNewNetworks(numToGen);
+            List<INeuralNetwork> mutated = _mutator.Mutate(sessions, numToMutate);
+            List<INeuralNetwork> newNetworks = getNewNetworks(numToGen);
             List<INeuralNetwork> allToAdd = new List<INeuralNetwork>();
-            allToAdd.AddRange(newSpecies);
+            allToAdd.AddRange(newNetworks);
             allToAdd.AddRange(children);
             allToAdd.AddRange(mutated);
             allToAdd.AddRange(toKeep);
@@ -143,6 +145,7 @@ namespace UnsupervisedTraining
 
         private List<INeuralNetwork> getNewNetworks(int numToGen)
         {
+            //TODO: have these new networks generated not according to config: random hidden neurons/layers, and random functions
             List<INeuralNetwork> newNets = new List<INeuralNetwork>();
             for (int i = 0; i < numToGen; i++)
             {
@@ -150,88 +153,6 @@ namespace UnsupervisedTraining
                 newNets.Add(newNet);
             }
             return newNets;
-        }
-
-        private List<INeuralNetwork> mutate(IList<TrainingSession> sessions, int numToMutate)
-        {
-            int numMutated = 0;
-            List<INeuralNetwork> mutated = new List<INeuralNetwork>();
-            Random random = new Random();
-            while (numMutated < numToMutate)
-            {
-                int i = random.Next(sessions.Count);
-                INeuralNetwork goodPerformer = sessions[i].NeuralNet;
-                NeuralNetworkGene childGenes = goodPerformer.GetGenes();
-
-                for (int n = 0; n < childGenes.InputGene.Neurons.Count; n++)
-                {
-                    var neuron = childGenes.InputGene.Neurons[n];
-                    childGenes.InputGene.Neurons[n] = TryMutateNeuron(neuron, random);
-                }
-
-                for (int h = 0; h < childGenes.HiddenGenes.Count; h++)
-                {
-                    for (int j = 0; j < childGenes.HiddenGenes[h].Neurons.Count; j++)
-                    {
-                        var neuron = childGenes.HiddenGenes[h].Neurons[j];
-                        childGenes.HiddenGenes[h].Neurons[j] = TryMutateNeuron(neuron, random);
-                    }
-                }
-                mutated.Add(_networkFactory.Create(childGenes));
-                numMutated++;
-            }
-            return mutated;
-        }
-
-        internal NeuronGene TryMutateNeuron(NeuronGene gene, Random random)
-        {
-            NeuronGene toReturn = new NeuronGene
-            {
-                Axon = new AxonGene
-                {
-                    Weights = new List<double>(),
-                    ActivationFunction = gene.Axon.ActivationFunction
-                },
-                Soma = new SomaGene
-                {
-                    SummationFunction = gene.Soma.SummationFunction
-                }
-            };
-            for (int j = 0; j < gene.Axon.Weights.Count; j++)
-            {
-                if (random.NextDouble() <= _mutateChance)
-                {
-                    double val = random.NextDouble();
-                    if (random.NextDouble() < 0.5)
-                    {
-                        // 50% chance of being negative, being between -1 and 1
-                        val = 0 - val;
-                    }
-                    toReturn.Axon.Weights.Add(val);
-                }
-                else
-                {
-                    toReturn.Axon.Weights.Add(gene.Axon.Weights[j]);
-                }
-            }
-            if (random.NextDouble() <= _mutateChance)
-            {
-                double val = random.NextDouble();
-                if (random.NextDouble() < 0.5)
-                {
-                    // 50% chance of being negative, being between -1 and 1
-                    val = 0 - val;
-                }
-                toReturn.Soma.Bias = val;
-            }
-            else
-            {
-                toReturn.Soma.Bias = gene.Soma.Bias;
-            }
-            return gene;
-        }
-
-             
+        }       
     }
-
 }
