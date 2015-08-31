@@ -55,15 +55,93 @@ namespace UnsupervisedTraining
                 childFatherGenes.InputGene.Neurons[n] = BreedNeuron(neuron, motherNeuron, random);
             }
 
-            for (int h = 0; h < childFatherGenes.HiddenGenes.Count; h++)
+            if (childFatherGenes.HiddenGenes.Count >= motherGenes.HiddenGenes.Count)
             {
-                for (int j = 0; j < childFatherGenes.HiddenGenes[h].Neurons.Count; j++)
+                for (int h = 0; h < childFatherGenes.HiddenGenes.Count; h++)
                 {
-                    var neuron = childFatherGenes.HiddenGenes[h].Neurons[j];
-                    var motherNeuron = motherGenes.HiddenGenes[h].Neurons[j];
-                    childFatherGenes.HiddenGenes[h].Neurons[j] = BreedNeuron(neuron, motherNeuron, random);
+                    //check to make sure they both have that hidden layer and only breed that layer if they both do. otherwise just keep the father's
+                    if (h < motherGenes.HiddenGenes.Count)
+                    {
+                        if (childFatherGenes.HiddenGenes[h].Neurons.Count >= motherGenes.HiddenGenes[h].Neurons.Count)
+                        {
+                            for (int j = 0; j < childFatherGenes.HiddenGenes[h].Neurons.Count; j++)
+                            {
+                                //only breed the neuron if the mother also has it. Otherwise just leave the childfather untouched.
+                                if (j < motherGenes.HiddenGenes[h].Neurons.Count)
+                                {
+                                    var neuron = childFatherGenes.HiddenGenes[h].Neurons[j];
+                                    var motherNeuron = motherGenes.HiddenGenes[h].Neurons[j];
+                                    childFatherGenes.HiddenGenes[h].Neurons[j] = BreedNeuron(neuron, motherNeuron, random);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            for (int j = 0; j < motherGenes.HiddenGenes[h].Neurons.Count; j++)
+                            {
+                                //only breed the neuron if the childfather also has it. Otherwise add the mothers to the childfathers whole.
+                                if (j < childFatherGenes.HiddenGenes[h].Neurons.Count)
+                                {
+                                    var neuron = childFatherGenes.HiddenGenes[h].Neurons[j];
+                                    var motherNeuron = motherGenes.HiddenGenes[h].Neurons[j];
+                                    childFatherGenes.HiddenGenes[h].Neurons[j] = BreedNeuron(neuron, motherNeuron, random);
+                                }
+                                else
+                                {
+                                    childFatherGenes.HiddenGenes[h].Neurons.Add(motherGenes.HiddenGenes[h].Neurons[j]);
+                                }
+                            }
+                        }
+                    }
                 }
             }
+            else
+            {
+                for (int h = 0; h < motherGenes.HiddenGenes.Count; h++)
+                {
+                    //check to make sure they both have that hidden layer and only breed that layer if they both do
+                    if (h < childFatherGenes.HiddenGenes.Count)
+                    {
+                        if (childFatherGenes.HiddenGenes[h].Neurons.Count >= motherGenes.HiddenGenes[h].Neurons.Count)
+                        {
+                            for (int j = 0; j < childFatherGenes.HiddenGenes[h].Neurons.Count; j++)
+                            {
+                                //only breed the neuron if the mother also has it. Otherwise just leave the childfather untouched.
+                                if (j < motherGenes.HiddenGenes[h].Neurons.Count)
+                                {
+                                    var neuron = childFatherGenes.HiddenGenes[h].Neurons[j];
+                                    var motherNeuron = motherGenes.HiddenGenes[h].Neurons[j];
+                                    childFatherGenes.HiddenGenes[h].Neurons[j] = BreedNeuron(neuron, motherNeuron, random);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            for (int j = 0; j < motherGenes.HiddenGenes[h].Neurons.Count; j++)
+                            {
+                                //only breed the neuron if the childfather also has it. Otherwise add the mothers to the childfathers whole.
+                                if (j < childFatherGenes.HiddenGenes[h].Neurons.Count)
+                                {
+                                    var neuron = childFatherGenes.HiddenGenes[h].Neurons[j];
+                                    var motherNeuron = motherGenes.HiddenGenes[h].Neurons[j];
+                                    childFatherGenes.HiddenGenes[h].Neurons[j] = BreedNeuron(neuron, motherNeuron, random);
+                                }
+                                else
+                                {
+                                    childFatherGenes.HiddenGenes[h].Neurons.Add(motherGenes.HiddenGenes[h].Neurons[j]);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //If only the mother has this layer, then add the whole layer to the childfather's
+                        childFatherGenes.HiddenGenes.Add(motherGenes.HiddenGenes[h]);
+                    }
+                }
+            }
+
+            
 
             for (int n = 0; n < childFatherGenes.OutputGene.Neurons.Count; n++)
             {
@@ -118,6 +196,7 @@ namespace UnsupervisedTraining
             {
                 toReturn.Axon.ActivationFunction = father.Axon.ActivationFunction;
             }
+
             if (random.NextDouble() < MOTHER_FATHER_BIAS)
             {
                 toReturn.Soma.SummationFunction = mother.Soma.SummationFunction;
@@ -126,6 +205,7 @@ namespace UnsupervisedTraining
             {
                 toReturn.Soma.SummationFunction = father.Soma.SummationFunction;
             }
+
             if (random.NextDouble() < MOTHER_FATHER_BIAS)
             {
                 toReturn.Soma.Bias = mother.Soma.Bias;
@@ -134,6 +214,7 @@ namespace UnsupervisedTraining
             {
                 toReturn.Soma.Bias = father.Soma.Bias;
             }
+
             return toReturn;
         }
     }   
