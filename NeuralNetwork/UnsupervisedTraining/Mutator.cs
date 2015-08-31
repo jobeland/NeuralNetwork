@@ -1,6 +1,8 @@
 ﻿using ArtificialNeuralNetwork;
+using ArtificialNeuralNetwork.ActivationFunctions;
 using ArtificialNeuralNetwork.Factories;
 using ArtificialNeuralNetwork.Genes;
+using ArtificialNeuralNetwork.SummationFunctions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,6 +61,7 @@ namespace UnsupervisedTraining
                     SummationFunction = gene.Soma.SummationFunction
                 }
             };
+            //weights
             for (int j = 0; j < gene.Axon.Weights.Count; j++)
             {
                 if (random.NextDouble() <= mutateChance)
@@ -76,6 +79,8 @@ namespace UnsupervisedTraining
                     toReturn.Axon.Weights.Add(gene.Axon.Weights[j]);
                 }
             }
+
+            //bias
             if (random.NextDouble() <= mutateChance)
             {
                 double val = random.NextDouble();
@@ -90,7 +95,69 @@ namespace UnsupervisedTraining
             {
                 toReturn.Soma.Bias = gene.Soma.Bias;
             }
+
+            //activation
+            if (random.NextDouble() <= mutateChance)
+            {
+                toReturn.Axon.ActivationFunction = GetRandomActivationFunction(random).GetType();
+            }
+            else
+            {
+                toReturn.Axon.ActivationFunction = gene.Axon.ActivationFunction;
+            }
+
+            //summation
+            if (random.NextDouble() <= mutateChance)
+            {
+                toReturn.Soma.SummationFunction = GetRandomSummationFunction(random).GetType();
+            }
+            else
+            {
+                toReturn.Soma.SummationFunction = gene.Soma.SummationFunction;
+            }
             return gene;
+        }
+
+        internal IActivationFunction GetRandomActivationFunction(Random random)
+        {
+            var value = random.Next(8);
+            switch (value)
+            {
+                case 0:
+                    return new TanhActivationFunction();
+                case 1:
+                    return new StepActivationFunction();
+                case 2:
+                    return new SinhActivationFunction();
+                case 3:
+                    return new AbsoluteXActivationFunction();
+                case 4:
+                    return new SechActivationFunction();
+                case 5:
+                    return new InverseActivationFunction();
+                case 6:
+                    return new IdentityActivationFunction();
+                case 7:
+                default:
+                    return new SigmoidActivationFunction();
+            }
+        }
+
+        internal ISummationFunction GetRandomSummationFunction(Random random)
+        {
+            var value = random.Next(8);
+            switch (value)
+            {
+                case 0:
+                    return new MinSummation();
+                case 1:
+                    return new AverageSummation();
+                case 2:
+                    return new MaxSummation();
+                case 3:
+                default:
+                    return new SimpleSummation();
+            }
         }
     }
 }
