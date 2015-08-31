@@ -57,91 +57,12 @@ namespace UnsupervisedTraining
 
             if (childFatherGenes.HiddenGenes.Count >= motherGenes.HiddenGenes.Count)
             {
-                for (int h = 0; h < childFatherGenes.HiddenGenes.Count; h++)
-                {
-                    //check to make sure they both have that hidden layer and only breed that layer if they both do. otherwise just keep the father's
-                    if (h < motherGenes.HiddenGenes.Count)
-                    {
-                        if (childFatherGenes.HiddenGenes[h].Neurons.Count >= motherGenes.HiddenGenes[h].Neurons.Count)
-                        {
-                            for (int j = 0; j < childFatherGenes.HiddenGenes[h].Neurons.Count; j++)
-                            {
-                                //only breed the neuron if the mother also has it. Otherwise just leave the childfather untouched.
-                                if (j < motherGenes.HiddenGenes[h].Neurons.Count)
-                                {
-                                    var neuron = childFatherGenes.HiddenGenes[h].Neurons[j];
-                                    var motherNeuron = motherGenes.HiddenGenes[h].Neurons[j];
-                                    childFatherGenes.HiddenGenes[h].Neurons[j] = BreedNeuron(neuron, motherNeuron, random);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            for (int j = 0; j < motherGenes.HiddenGenes[h].Neurons.Count; j++)
-                            {
-                                //only breed the neuron if the childfather also has it. Otherwise add the mothers to the childfathers whole.
-                                if (j < childFatherGenes.HiddenGenes[h].Neurons.Count)
-                                {
-                                    var neuron = childFatherGenes.HiddenGenes[h].Neurons[j];
-                                    var motherNeuron = motherGenes.HiddenGenes[h].Neurons[j];
-                                    childFatherGenes.HiddenGenes[h].Neurons[j] = BreedNeuron(neuron, motherNeuron, random);
-                                }
-                                else
-                                {
-                                    childFatherGenes.HiddenGenes[h].Neurons.Add(motherGenes.HiddenGenes[h].Neurons[j]);
-                                }
-                            }
-                        }
-                    }
-                }
+                childFatherGenes.HiddenGenes = MateHiddenLayers(childFatherGenes.HiddenGenes, motherGenes.HiddenGenes, random);
             }
             else
             {
-                for (int h = 0; h < motherGenes.HiddenGenes.Count; h++)
-                {
-                    //check to make sure they both have that hidden layer and only breed that layer if they both do
-                    if (h < childFatherGenes.HiddenGenes.Count)
-                    {
-                        if (childFatherGenes.HiddenGenes[h].Neurons.Count >= motherGenes.HiddenGenes[h].Neurons.Count)
-                        {
-                            for (int j = 0; j < childFatherGenes.HiddenGenes[h].Neurons.Count; j++)
-                            {
-                                //only breed the neuron if the mother also has it. Otherwise just leave the childfather untouched.
-                                if (j < motherGenes.HiddenGenes[h].Neurons.Count)
-                                {
-                                    var neuron = childFatherGenes.HiddenGenes[h].Neurons[j];
-                                    var motherNeuron = motherGenes.HiddenGenes[h].Neurons[j];
-                                    childFatherGenes.HiddenGenes[h].Neurons[j] = BreedNeuron(neuron, motherNeuron, random);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            for (int j = 0; j < motherGenes.HiddenGenes[h].Neurons.Count; j++)
-                            {
-                                //only breed the neuron if the childfather also has it. Otherwise add the mothers to the childfathers whole.
-                                if (j < childFatherGenes.HiddenGenes[h].Neurons.Count)
-                                {
-                                    var neuron = childFatherGenes.HiddenGenes[h].Neurons[j];
-                                    var motherNeuron = motherGenes.HiddenGenes[h].Neurons[j];
-                                    childFatherGenes.HiddenGenes[h].Neurons[j] = BreedNeuron(neuron, motherNeuron, random);
-                                }
-                                else
-                                {
-                                    childFatherGenes.HiddenGenes[h].Neurons.Add(motherGenes.HiddenGenes[h].Neurons[j]);
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        //If only the mother has this layer, then add the whole layer to the childfather's
-                        childFatherGenes.HiddenGenes.Add(motherGenes.HiddenGenes[h]);
-                    }
-                }
+                childFatherGenes.HiddenGenes = MateHiddenLayers(motherGenes.HiddenGenes, childFatherGenes.HiddenGenes, random);
             }
-
-            
 
             for (int n = 0; n < childFatherGenes.OutputGene.Neurons.Count; n++)
             {
@@ -154,7 +75,57 @@ namespace UnsupervisedTraining
             return child;
         }
 
-        internal IList<double> BreedAxonWeights(NeuronGene moreTerminals, NeuronGene lessTerminals, Random random)
+        internal IList<LayerGene> MateHiddenLayers(IList<LayerGene> moreLayers, IList<LayerGene> lessLayers, Random random)
+        {
+            var matedLayers = new List<LayerGene>();
+            for (int h = 0; h < moreLayers.Count; h++)
+            {
+                //check to make sure they both have that hidden layer and only breed that layer if they both do. otherwise just keep the father's
+                if (h < lessLayers.Count)
+                {
+                    if (moreLayers[h].Neurons.Count >= lessLayers[h].Neurons.Count)
+                    {
+                        matedLayers.Add(MateLayer(moreLayers[h], lessLayers[h], random));
+                    }
+                    else
+                    {
+                        matedLayers.Add(MateLayer(lessLayers[h], moreLayers[h], random));
+                    }
+                }
+                else
+                {
+                    matedLayers.Add(moreLayers[h]);
+                }
+            }
+            return matedLayers;
+        }
+
+
+        internal LayerGene MateLayer(LayerGene moreNeurons, LayerGene lessNeurons, Random random)
+        {
+            LayerGene childGene = new LayerGene
+            {
+                Neurons = new List<NeuronGene>()
+            };
+
+            for (int j = 0; j < moreNeurons.Neurons.Count; j++)
+            {
+                //only breed the neuron if the mother also has it. Otherwise just leave add the extra neuron untouched.
+                if (j < lessNeurons.Neurons.Count)
+                {
+                    var neuron = moreNeurons.Neurons[j];
+                    var lessNeuron = lessNeurons.Neurons[j];
+                    childGene.Neurons.Add(BreedNeuron(neuron, lessNeuron, random));
+                }
+                else
+                {
+                    childGene.Neurons.Add(moreNeurons.Neurons[j]);
+                }
+            }
+            return childGene;
+        }
+
+        internal IList<double> MateAxonWeights(NeuronGene moreTerminals, NeuronGene lessTerminals, Random random)
         {
             var weights = new List<double>();
             for (int j = 0; j < moreTerminals.Axon.Weights.Count; j++)
@@ -181,11 +152,11 @@ namespace UnsupervisedTraining
             };
             if (father.Axon.Weights.Count >= mother.Axon.Weights.Count)
             {
-                toReturn.Axon.Weights = BreedAxonWeights(father, mother, random);
+                toReturn.Axon.Weights = MateAxonWeights(father, mother, random);
             }
             else
             {
-                toReturn.Axon.Weights = BreedAxonWeights(mother, father, random);
+                toReturn.Axon.Weights = MateAxonWeights(mother, father, random);
             }
 
             if (random.NextDouble() < MOTHER_FATHER_BIAS)
