@@ -14,10 +14,12 @@ namespace UnsupervisedTraining
     public class Mutator : IMutator
     {
         private readonly INeuralNetworkFactory _networkFactory;
+        private readonly IWeightInitializer _weightInitializer;
 
-        public Mutator(INeuralNetworkFactory networkFactory)
+        public Mutator(INeuralNetworkFactory networkFactory, IWeightInitializer weightInitializer)
         {
             _networkFactory = networkFactory;
+            _weightInitializer = weightInitializer;
         }
 
         public IList<INeuralNetwork> Mutate(IList<INeuralNetwork> networks, double mutateChance)
@@ -36,6 +38,7 @@ namespace UnsupervisedTraining
 
                 for (int h = 0; h < childGenes.HiddenGenes.Count; h++)
                 {
+                    childGenes.HiddenGenes[h] = TryAddNeuronsToLayer(childGenes, h, mutateChance, random);
                     for (int j = 0; j < childGenes.HiddenGenes[h].Neurons.Count; j++)
                     {
                         var neuron = childGenes.HiddenGenes[h].Neurons[j];
@@ -45,6 +48,60 @@ namespace UnsupervisedTraining
                 completed.Add(_networkFactory.Create(childGenes));
             }
             return completed;
+        }
+
+        internal LayerGene TryAddNeuronsToLayer(NeuralNetworkGene networkGenes, int hiddenLayerIndex, double mutateChance, Random random)
+        {
+            LayerGene hiddenLayer = networkGenes.HiddenGenes[hiddenLayerIndex];
+            while(random.NextDouble() <= mutateChance)
+            {
+                var neuronGene = new NeuronGene
+                {
+                    Axon = new AxonGene
+                    {
+                        Weights = new List<double>(),
+                        ActivationFunction = GetRandomActivationFunction(random).GetType()
+                    },
+                    Soma = new SomaGene
+                    {
+                        Bias = _weightInitializer.InitializeWeight(),
+                        SummationFunction = GetRandomSummationFunction(random).GetType()
+                    }
+                };
+
+                //update layer-1 axon terminals
+                LayerGene previousLayer = null;
+                if (hiddenLayerIndex == 0)
+                {
+                    previousLayer = networkGenes.InputGene;
+                }
+                else
+                {
+                    previousLayer = networkGenes.HiddenGenes[hiddenLayerIndex - 1];
+                }
+                foreach (NeuronGene neuron in previousLayer.Neurons)
+                {
+                    neuron.Axon.Weights.Add(_weightInitializer.InitializeWeight());
+                }
+
+                //update terminals for current neuron
+                LayerGene nextlayer = null;
+                if (hiddenLayerIndex == networkGenes.HiddenGenes.Count - 1)
+                {
+                    nextlayer = networkGenes.OutputGene;
+                }
+                else
+                {
+                    nextlayer = networkGenes.HiddenGenes[hiddenLayerIndex + 1];
+                }
+                for (int i = 0; i < nextlayer.Neurons.Count; i++)
+                {
+                    neuronGene.Axon.Weights.Add(_weightInitializer.InitializeWeight());
+                }
+
+                hiddenLayer.Neurons.Add(neuronGene);
+            }
+            return hiddenLayer;
         }
 
         internal NeuronGene TryMutateNeuron(NeuronGene gene, Random random, double mutateChance)
@@ -145,7 +202,7 @@ namespace UnsupervisedTraining
 
         internal ISummationFunction GetRandomSummationFunction(Random random)
         {
-            var value = random.Next(8);
+            var value = random.Next(4);
             switch (value)
             {
                 case 0:

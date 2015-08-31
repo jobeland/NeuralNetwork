@@ -33,12 +33,13 @@ namespace Trainer
             {
                 NormalMutationRate = 0.05,
                 HighMutationRate = 0.5,
-                GenerationsPerEpoch = 100,
+                GenerationsPerEpoch = 10,
                 NumEpochs = 1000
             };
-            INeuralNetworkFactory factory = NeuralNetworkFactory.GetInstance(SomaFactory.GetInstance(networkConfig.SummationFunction), AxonFactory.GetInstance(networkConfig.ActivationFunction), SynapseFactory.GetInstance(new RandomWeightInitializer(new Random())), SynapseFactory.GetInstance(new ConstantWeightInitializer(1.0)), new RandomWeightInitializer(new Random()));
+            var random = new RandomWeightInitializer(new Random());
+            INeuralNetworkFactory factory = NeuralNetworkFactory.GetInstance(SomaFactory.GetInstance(networkConfig.SummationFunction), AxonFactory.GetInstance(networkConfig.ActivationFunction), SynapseFactory.GetInstance(new RandomWeightInitializer(new Random())), SynapseFactory.GetInstance(new ConstantWeightInitializer(1.0)), random);
             IBreeder breeder = new Breeder(factory);
-            IMutator mutator = new Mutator(factory);
+            IMutator mutator = new Mutator(factory, random);
             IEvalWorkingSet history = new EvalWorkingSet(50);
 
             GeneticAlgorithm evolver = new GeneticAlgorithm(networkConfig, generationSettings, evolutionSettings, factory, breeder, mutator, history);
