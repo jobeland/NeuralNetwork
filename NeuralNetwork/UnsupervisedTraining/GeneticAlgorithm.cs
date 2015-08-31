@@ -54,7 +54,10 @@ namespace UnsupervisedTraining
             {
                 for (int generation = 0; generation < _evolutionConfig.GenerationsPerEpoch; generation++)
                 {
-
+                    if (epoch != 0 || generation != 0)
+                    {
+                        createNextGeneration();
+                    }
                     _generation.Run();
 
                     var evals = _generation.GetEvalsForGeneration();
@@ -66,8 +69,6 @@ namespace UnsupervisedTraining
                         LoggerFactory.GetLogger().Log(LogLevel.Info, string.Format("eval: {0}", evals[i]));
                     }
                     LoggerFactory.GetLogger().Log(LogLevel.Info, string.Format("count: {0}", count));
-
-                    createNextGeneration();
                     LoggerFactory.GetLogger().Log(LogLevel.Info, string.Format("Epoch: {0},  Generation: {1}", epoch, generation));
 
                 }

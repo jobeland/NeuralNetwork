@@ -9,7 +9,7 @@ namespace UnsupervisedTraining
 {
     public class Generation
     {
-        public double[] Evals { get; set; }
+        private double[] _evals { get; set; }
         private IList<ITrainingSession> _sessions;
         private readonly GenerationConfigurationSettings _generationConfig;
 
@@ -39,19 +39,19 @@ namespace UnsupervisedTraining
 
         public double[] GetEvalsForGeneration()
         {
-            if (Evals == null)
+            if (_evals == null)
             {
-                Evals = new double[_sessions.Count];
+                _evals = new double[_sessions.Count];
                 for (int i = 0; i < _sessions.Count; i++)
                 {
-                    Evals[i] = _sessions[i].GetSessionEvaluation();
+                    _evals[i] = _sessions[i].GetSessionEvaluation();
                 }
             }
             //TODO: this shouldn't be in Evals anymore, but just called directly off of the training session
             double[] toReturn = new double[_sessions.Count];
             for (int i = 0; i < _sessions.Count; i++)
             {
-                toReturn[i] = Evals[i];
+                toReturn[i] = _evals[i];
             }
             return toReturn;
         }
@@ -59,10 +59,11 @@ namespace UnsupervisedTraining
         public ITrainingSession GetBestPerformer()
         {
             int indexToKeep = 0;
-            for (int performer = 0; performer < Evals.Length; performer++)
+            var evals = GetEvalsForGeneration();
+            for (int performer = 0; performer < evals.Length; performer++)
             {
-                double value = Evals[performer];
-                if (value > Evals[indexToKeep])
+                double value = evals[performer];
+                if (value > evals[indexToKeep])
                 {
                     indexToKeep = performer;
                 }

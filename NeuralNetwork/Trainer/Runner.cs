@@ -26,7 +26,7 @@ namespace Trainer
             GenerationConfigurationSettings generationSettings = new GenerationConfigurationSettings
             {
                 UseMultithreading = true,
-                GenerationPopulation = 100
+                GenerationPopulation = 1000
 
             };
             EvolutionConfigurationSettings evolutionSettings = new EvolutionConfigurationSettings
