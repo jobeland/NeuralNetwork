@@ -135,7 +135,6 @@ namespace UnsupervisedTraining
             }
             IList<INeuralNetwork> newNetworks = getNewNetworks(numToGen);
 
-            //TODO: need to fix rate of mutation vs num to mutate
             List<INeuralNetwork> toTryMutate = new List<INeuralNetwork>();
             toTryMutate.AddRange(toKeep);
             toTryMutate.AddRange(newNetworks);

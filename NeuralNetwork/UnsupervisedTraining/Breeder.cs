@@ -12,6 +12,8 @@ namespace UnsupervisedTraining
     public class Breeder : IBreeder
     {
         private readonly INeuralNetworkFactory _networkFactory;
+        private const double MOTHER_FATHER_BIAS = 0.5;
+
 
         public Breeder(INeuralNetworkFactory networkFactory)
         {
@@ -74,28 +76,41 @@ namespace UnsupervisedTraining
             return child;
         }
 
+        internal IList<double> BreedAxonWeights(NeuronGene moreTerminals, NeuronGene lessTerminals, Random random)
+        {
+            var weights = new List<double>();
+            for (int j = 0; j < moreTerminals.Axon.Weights.Count; j++)
+            {
+                if (random.NextDouble() < MOTHER_FATHER_BIAS && j < lessTerminals.Axon.Weights.Count)
+                {
+                    weights.Add(lessTerminals.Axon.Weights[j]);
+                }
+                else
+                {
+                    weights.Add(moreTerminals.Axon.Weights[j]);
+                }
+            }
+            return weights;
+        }
+
+
         internal NeuronGene BreedNeuron(NeuronGene father, NeuronGene mother, Random random)
         {
             NeuronGene toReturn = new NeuronGene
             {
-                Axon = new AxonGene
-                {
-                    Weights = new List<double>()
-                },
+                Axon = new AxonGene(),
                 Soma = new SomaGene()
             };
-            for (int j = 0; j < father.Axon.Weights.Count; j++)
+            if (father.Axon.Weights.Count >= mother.Axon.Weights.Count)
             {
-                if (random.NextDouble() < 0.5)
-                {
-                    toReturn.Axon.Weights.Add(mother.Axon.Weights[j]);
-                }
-                else
-                {
-                    toReturn.Axon.Weights.Add(father.Axon.Weights[j]);
-                }
+                toReturn.Axon.Weights = BreedAxonWeights(father, mother, random);
             }
-            if (random.NextDouble() < 0.5)
+            else
+            {
+                toReturn.Axon.Weights = BreedAxonWeights(mother, father, random);
+            }
+
+            if (random.NextDouble() < MOTHER_FATHER_BIAS)
             {
                 toReturn.Axon.ActivationFunction = mother.Axon.ActivationFunction;
             }
@@ -103,7 +118,7 @@ namespace UnsupervisedTraining
             {
                 toReturn.Axon.ActivationFunction = father.Axon.ActivationFunction;
             }
-            if (random.NextDouble() < 0.5)
+            if (random.NextDouble() < MOTHER_FATHER_BIAS)
             {
                 toReturn.Soma.SummationFunction = mother.Soma.SummationFunction;
             }
@@ -111,7 +126,7 @@ namespace UnsupervisedTraining
             {
                 toReturn.Soma.SummationFunction = father.Soma.SummationFunction;
             }
-            if (random.NextDouble() < 0.5)
+            if (random.NextDouble() < MOTHER_FATHER_BIAS)
             {
                 toReturn.Soma.Bias = mother.Soma.Bias;
             }
