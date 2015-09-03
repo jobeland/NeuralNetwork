@@ -29,6 +29,7 @@ namespace UnsupervisedTraining
             foreach (INeuralNetwork net in networks)
             {
                 NeuralNetworkGene childGenes = net.GetGenes();
+                childGenes = TryAddLayerToNetwork(childGenes, mutateChance, random);
 
                 for (int n = 0; n < childGenes.InputGene.Neurons.Count; n++)
                 {
@@ -50,56 +51,46 @@ namespace UnsupervisedTraining
             return completed;
         }
 
+        internal NeuralNetworkGene TryAddLayerToNetwork(NeuralNetworkGene genes, double mutateChance, Random random)
+        {
+            NeuralNetworkGene newGenes = genes;
+            while (random.NextDouble() <= mutateChance)
+            {
+                int layerToReplace = random.Next(newGenes.HiddenGenes.Count);
+
+                //update layer-1 axon terminals
+                LayerGene previousLayer = GetPreviousLayerGene(newGenes, layerToReplace);
+                foreach (NeuronGene neuron in previousLayer.Neurons)
+                {
+                    neuron.Axon.Weights.Clear();
+                    neuron.Axon.Weights.Add(_weightInitializer.InitializeWeight());
+                }
+
+                LayerGene newLayer = new LayerGene
+                {
+                    Neurons = new List<NeuronGene>()
+                };
+                newGenes.HiddenGenes.Insert(layerToReplace, newLayer);
+
+                var newNeuron = GetRandomHiddenNeuronGene(newGenes, layerToReplace, random);
+                newGenes.HiddenGenes[layerToReplace].Neurons.Add(newNeuron);
+            }
+            return newGenes;
+        }
+
         internal LayerGene TryAddNeuronsToLayer(NeuralNetworkGene networkGenes, int hiddenLayerIndex, double mutateChance, Random random)
         {
             LayerGene hiddenLayer = networkGenes.HiddenGenes[hiddenLayerIndex];
-            while(random.NextDouble() <= mutateChance)
+            while (random.NextDouble() <= mutateChance)
             {
-                var neuronGene = new NeuronGene
-                {
-                    Axon = new AxonGene
-                    {
-                        Weights = new List<double>(),
-                        ActivationFunction = GetRandomActivationFunction(random).GetType()
-                    },
-                    Soma = new SomaGene
-                    {
-                        Bias = _weightInitializer.InitializeWeight(),
-                        SummationFunction = GetRandomSummationFunction(random).GetType()
-                    }
-                };
-
                 //update layer-1 axon terminals
-                LayerGene previousLayer = null;
-                if (hiddenLayerIndex == 0)
-                {
-                    previousLayer = networkGenes.InputGene;
-                }
-                else
-                {
-                    previousLayer = networkGenes.HiddenGenes[hiddenLayerIndex - 1];
-                }
+                LayerGene previousLayer = GetPreviousLayerGene(networkGenes, hiddenLayerIndex);
                 foreach (NeuronGene neuron in previousLayer.Neurons)
                 {
                     neuron.Axon.Weights.Add(_weightInitializer.InitializeWeight());
                 }
 
-                //update terminals for current neuron
-                LayerGene nextlayer = null;
-                if (hiddenLayerIndex == networkGenes.HiddenGenes.Count - 1)
-                {
-                    nextlayer = networkGenes.OutputGene;
-                }
-                else
-                {
-                    nextlayer = networkGenes.HiddenGenes[hiddenLayerIndex + 1];
-                }
-                for (int i = 0; i < nextlayer.Neurons.Count; i++)
-                {
-                    neuronGene.Axon.Weights.Add(_weightInitializer.InitializeWeight());
-                }
-
-                hiddenLayer.Neurons.Add(neuronGene);
+                hiddenLayer.Neurons.Add(GetRandomHiddenNeuronGene(networkGenes, hiddenLayerIndex, random));
             }
             return hiddenLayer;
         }
@@ -173,6 +164,54 @@ namespace UnsupervisedTraining
                 toReturn.Soma.SummationFunction = gene.Soma.SummationFunction;
             }
             return gene;
+        }
+
+        internal LayerGene GetPreviousLayerGene(NeuralNetworkGene genes, int hiddenLayerIndex)
+        {
+            if (hiddenLayerIndex == 0)
+            {
+                return genes.InputGene;
+            }
+            else
+            {
+                return genes.HiddenGenes[hiddenLayerIndex - 1];
+            }
+        }
+
+        internal LayerGene GetNextLayerGene(NeuralNetworkGene genes, int hiddenLayerIndex)
+        {
+            if (hiddenLayerIndex == genes.HiddenGenes.Count - 1)
+            {
+                return genes.OutputGene;
+            }
+            else
+            {
+                return genes.HiddenGenes[hiddenLayerIndex + 1];
+            }
+        }
+
+        internal NeuronGene GetRandomHiddenNeuronGene(NeuralNetworkGene networkGenes, int hiddenLayerIndex, Random random)
+        {
+            var neuronGene = new NeuronGene
+            {
+                Axon = new AxonGene
+                {
+                    Weights = new List<double>(),
+                    ActivationFunction = GetRandomActivationFunction(random).GetType()
+                },
+                Soma = new SomaGene
+                {
+                    Bias = _weightInitializer.InitializeWeight(),
+                    SummationFunction = GetRandomSummationFunction(random).GetType()
+                }
+            };
+            //update terminals for current neuron
+            LayerGene nextlayer = GetNextLayerGene(networkGenes, hiddenLayerIndex);
+            for (int i = 0; i < nextlayer.Neurons.Count; i++)
+            {
+                neuronGene.Axon.Weights.Add(_weightInitializer.InitializeWeight());
+            }
+            return neuronGene;
         }
 
         internal IActivationFunction GetRandomActivationFunction(Random random)
