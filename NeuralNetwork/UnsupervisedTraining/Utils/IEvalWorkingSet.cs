@@ -1,5 +1,5 @@
 ﻿using System;
-namespace UnsupervisedTraining
+namespace UnsupervisedTraining.Utils
 {
     public interface IEvalWorkingSet
     {

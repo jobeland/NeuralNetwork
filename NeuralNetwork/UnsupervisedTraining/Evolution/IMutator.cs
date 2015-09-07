@@ -1,7 +1,7 @@
 ﻿using ArtificialNeuralNetwork;
 using System;
 using System.Collections.Generic;
-namespace UnsupervisedTraining
+namespace UnsupervisedTraining.Evolution
 {
     public interface IMutator
     {

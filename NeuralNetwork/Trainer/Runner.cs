@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using UnsupervisedTraining;
 using UnsupervisedTraining.Evaluatable;
+using UnsupervisedTraining.Evolution;
+using UnsupervisedTraining.Utils;
 
 namespace Trainer
 {

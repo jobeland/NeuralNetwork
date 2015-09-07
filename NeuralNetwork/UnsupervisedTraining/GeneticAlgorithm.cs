@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UnsupervisedTraining.Evaluatable;
+using UnsupervisedTraining.Evolution;
 using UnsupervisedTraining.Utils;
 
 namespace UnsupervisedTraining
