@@ -49,8 +49,9 @@ namespace Trainer
             IBreeder breeder = new Breeder(factory, random);
             IMutator mutator = new Mutator(factory, random, mutationSettings);
             IEvalWorkingSet history = new EvalWorkingSet(50);
+            IEvaluatableFactory evaluatableFactory = new GameEvaluationFactory();
 
-            GeneticAlgorithm evolver = new GeneticAlgorithm(networkConfig, generationSettings, evolutionSettings, factory, breeder, mutator, history);
+            GeneticAlgorithm evolver = new GeneticAlgorithm(networkConfig, generationSettings, evolutionSettings, factory, breeder, mutator, history, evaluatableFactory);
             evolver.runEpoch();
         }
     }

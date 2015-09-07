@@ -2,7 +2,6 @@
 using ArtificialNeuralNetwork.ActivationFunctions;
 using ArtificialNeuralNetwork.Factories;
 using ArtificialNeuralNetwork.Genes;
-using BasicGame;
 using Logging;
 using System;
 using System.Collections.Generic;
@@ -19,6 +18,7 @@ namespace UnsupervisedTraining
     {
         private INeuralNetworkFactory _networkFactory;
         private readonly IEvalWorkingSet _history;
+        private readonly IEvaluatableFactory _evaluatableFactory;
 
         private readonly NeuralNetworkConfigurationSettings _networkConfig;
         private readonly GenerationConfigurationSettings _generationConfig;
@@ -31,22 +31,25 @@ namespace UnsupervisedTraining
         private Generation _generation;
 
 
-        public GeneticAlgorithm(NeuralNetworkConfigurationSettings networkConfig, GenerationConfigurationSettings generationConfig, EvolutionConfigurationSettings evolutionConfig, INeuralNetworkFactory networkFactory, IBreeder breeder, IMutator mutator, IEvalWorkingSet workingSet)
+        public GeneticAlgorithm(NeuralNetworkConfigurationSettings networkConfig, GenerationConfigurationSettings generationConfig, EvolutionConfigurationSettings evolutionConfig, INeuralNetworkFactory networkFactory, IBreeder breeder, IMutator mutator, IEvalWorkingSet workingSet, IEvaluatableFactory evaluatableFactory)
         {
             _networkConfig = networkConfig;
             _generationConfig = generationConfig;
             _evolutionConfig = evolutionConfig;
             var sessions = new List<ITrainingSession>();
             _networkFactory = networkFactory;
-            for (int i = 0; i < _generationConfig.GenerationPopulation; i++)
-            {
-                sessions.Add(new TrainingSession(_networkFactory.Create(_networkConfig.NumInputNeurons, _networkConfig.NumOutputNeurons, _networkConfig.NumHiddenLayers, _networkConfig.NumHiddenNeurons), new Game(10, 10, 300), i));
-            }
-            _generation = new Generation(sessions, _generationConfig);
-
             _breeder = breeder;
             _mutator = mutator;
             _history = workingSet;
+            _evaluatableFactory = evaluatableFactory;
+            for (int i = 0; i < _generationConfig.GenerationPopulation; i++)
+            {
+                var network = _networkFactory.Create(_networkConfig.NumInputNeurons, _networkConfig.NumOutputNeurons, _networkConfig.NumHiddenLayers, _networkConfig.NumHiddenNeurons);
+                sessions.Add(new TrainingSession(network, _evaluatableFactory.Create(network), i));
+            }
+            _generation = new Generation(sessions, _generationConfig);
+
+
         }
 
         public void runEpoch()
@@ -109,7 +112,7 @@ namespace UnsupervisedTraining
             }
 
             IList<INeuralNetwork> children = _breeder.Breed(sessions, numToBreed);
-            
+
             IList<INeuralNetwork> toKeep = sessions.Select(session => session.NeuralNet).ToList();
             int numToLiveOn = toKeep.Count / 10;
             IList<INeuralNetwork> liveOn = toKeep.Take(numToLiveOn).ToList();
@@ -132,7 +135,7 @@ namespace UnsupervisedTraining
             var newSessions = new List<ITrainingSession>();
             for (int net = 0; net < allToAdd.Count; net++)
             {
-                newSessions.Add(new TrainingSession(allToAdd[net], new Game(10, 10, 300), net));
+                newSessions.Add(new TrainingSession(allToAdd[net], _evaluatableFactory.Create(allToAdd[net]), net));
             }
             _generation = new Generation(newSessions, _generationConfig);
 
@@ -150,6 +153,6 @@ namespace UnsupervisedTraining
                 newNets.Add(newNet);
             }
             return newNets;
-        }       
+        }
     }
 }

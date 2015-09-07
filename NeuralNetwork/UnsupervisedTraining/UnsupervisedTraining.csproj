@@ -51,6 +51,8 @@
     <Compile Include="GeneticAlgorithm.cs" />
     <Compile Include="GenerationConfigurationSettings.cs" />
     <Compile Include="IBreeder.cs" />
+    <Compile Include="IEvaluatable.cs" />
+    <Compile Include="IEvaluatableFactory.cs" />
     <Compile Include="IEvalWorkingSet.cs" />
     <Compile Include="IMutator.cs" />
     <Compile Include="INeuralNetworkLoader.cs" />
@@ -68,10 +70,6 @@
     <Compile Include="WeightedSessionList.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BasicGame\BasicGame.csproj">
-      <Project>{6413cd24-b15c-4996-8e42-e8f85766b24e}</Project>
-      <Name>BasicGame</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Logging\Logging.csproj">
       <Project>{3e71ff3f-fa56-45eb-a8fb-43b87b466826}</Project>
       <Name>Logging</Name>
