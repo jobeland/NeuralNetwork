@@ -136,7 +136,7 @@ namespace ArtificialNeuralNetwork.Factories
             return terminals;
         }
 
-        private IList<Synapse> getDendritesForSoma(int layer, int terminalIndexInLayer, Dictionary<int, Dictionary<int, IList<Synapse>>> mapping)
+        private IList<Synapse> getDendritesForSoma(int layer, int terminalIndexInNeuron, Dictionary<int, Dictionary<int, IList<Synapse>>> mapping)
         {
             //get entire layer before, then grab the nth synapse from each list
             if (layer < 1)
@@ -148,7 +148,8 @@ namespace ArtificialNeuralNetwork.Factories
             IList<Synapse> dendrites = new List<Synapse>();
             foreach (var neuron in neuronMappings.Keys)
             {
-                dendrites.Add(neuronMappings[neuron][terminalIndexInLayer]);
+                //TODO: this fails sometimes when using multiple hidden layers
+                dendrites.Add(neuronMappings[neuron][terminalIndexInNeuron]);
             }
 
             return dendrites;
@@ -162,16 +163,16 @@ namespace ArtificialNeuralNetwork.Factories
             var inputs = GetAllSynapsesFromLayerMapping(mapping[0]);
             var outputs = GetAllSynapsesFromLayerMapping(mapping[mapping.Keys.Count - 1]);
 
-            ILayer inputLayer = CreateLayerFromGene(genes.InputGene, mapping, 0, genes.InputGene.Neurons.Count);
+            ILayer inputLayer = CreateLayerFromGene(genes.InputGene, mapping, 0);
 
             //Hidden layers
             IList<ILayer> hiddenLayers = new List<ILayer>();
             for (int h = 0; h < genes.HiddenGenes.Count; h++)
             {
-                hiddenLayers.Add(CreateLayerFromGene(genes.HiddenGenes[h], mapping, h + 1, genes.HiddenGenes[h].Neurons.Count));
+                hiddenLayers.Add(CreateLayerFromGene(genes.HiddenGenes[h], mapping, h + 1));
             }
 
-            ILayer outputLayer = CreateLayerFromGene(genes.OutputGene, mapping, genes.HiddenGenes.Count + 1, genes.OutputGene.Neurons.Count);
+            ILayer outputLayer = CreateLayerFromGene(genes.OutputGene, mapping, genes.HiddenGenes.Count + 1);
 
             return NeuralNetwork.GetInstance(inputs, inputLayer, hiddenLayers, outputLayer, outputs);
         }
@@ -220,7 +221,7 @@ namespace ArtificialNeuralNetwork.Factories
             return terminals;
         }
 
-        internal ILayer CreateLayerFromGene(LayerGene layerGene, Dictionary<int, Dictionary<int, IList<Synapse>>> synapseMapping, int layerInNetwork, int numberOfNeurons)
+        internal ILayer CreateLayerFromGene(LayerGene layerGene, Dictionary<int, Dictionary<int, IList<Synapse>>> synapseMapping, int layerInNetwork)
         {
             IList<INeuron> layerNeurons = new List<INeuron>();
             for (int i = 0; i < layerGene.Neurons.Count; i++)

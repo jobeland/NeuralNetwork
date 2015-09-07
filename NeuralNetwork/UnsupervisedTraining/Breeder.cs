@@ -12,12 +12,14 @@ namespace UnsupervisedTraining
     public class Breeder : IBreeder
     {
         private readonly INeuralNetworkFactory _networkFactory;
+        private readonly IWeightInitializer _weightInitializer;
         private const double MOTHER_FATHER_BIAS = 0.5;
 
 
-        public Breeder(INeuralNetworkFactory networkFactory)
+        public Breeder(INeuralNetworkFactory networkFactory, IWeightInitializer weightInitializer)
         {
             _networkFactory = networkFactory;
+            _weightInitializer = weightInitializer;
         }
 
         public IList<INeuralNetwork> Breed(IList<ITrainingSession> sessions, int numToBreed)
@@ -80,7 +82,7 @@ namespace UnsupervisedTraining
             var matedLayers = new List<LayerGene>();
             for (int h = 0; h < moreLayers.Count; h++)
             {
-                //check to make sure they both have that hidden layer and only breed that layer if they both do. otherwise just keep the father's
+                //check to make sure they both have that hidden layer and only breed that layer if they both do. otherwise just keep it untouched
                 if (h < lessLayers.Count)
                 {
                     if (moreLayers[h].Neurons.Count >= lessLayers[h].Neurons.Count)
@@ -108,9 +110,12 @@ namespace UnsupervisedTraining
                 Neurons = new List<NeuronGene>()
             };
 
+            var sameNumberOfTerminalsPerNeuronForBothMates = moreNeurons.Neurons[0].Axon.Weights.Count == lessNeurons.Neurons[0].Axon.Weights.Count;
+            var maxTerminals = Math.Max(moreNeurons.Neurons[0].Axon.Weights.Count, lessNeurons.Neurons[0].Axon.Weights.Count);
+
             for (int j = 0; j < moreNeurons.Neurons.Count; j++)
             {
-                //only breed the neuron if the mother also has it. Otherwise just leave add the extra neuron untouched.
+                //only breed the neuron if both mates have it. Otherwise just leave add the extra neuron untouched.
                 if (j < lessNeurons.Neurons.Count)
                 {
                     var neuron = moreNeurons.Neurons[j];
@@ -119,10 +124,53 @@ namespace UnsupervisedTraining
                 }
                 else
                 {
-                    childGene.Neurons.Add(moreNeurons.Neurons[j]);
+                    if (sameNumberOfTerminalsPerNeuronForBothMates)
+                    {
+                        childGene.Neurons.Add(moreNeurons.Neurons[j]);
+                    }
+                    else
+                    {
+                        childGene.Neurons.Add(AdjustAxonTerminalsOfNeuronGene(moreNeurons.Neurons[j], maxTerminals));
+                    }
                 }
             }
             return childGene;
+        }
+
+        internal NeuronGene AdjustAxonTerminalsOfNeuronGene(NeuronGene gene, int desiredNumberOfTerminals)
+        {
+            NeuronGene toReturn = new NeuronGene
+            {
+                Axon = new AxonGene(),
+                Soma = new SomaGene()
+            };
+
+            toReturn.Axon.ActivationFunction = gene.Axon.ActivationFunction;
+            toReturn.Axon.Weights = new List<double>();
+            toReturn.Soma.SummationFunction = gene.Soma.SummationFunction;
+            toReturn.Soma.Bias = gene.Soma.Bias;
+
+            if (desiredNumberOfTerminals > gene.Axon.Weights.Count)
+            {
+                for (int i = 0; i < gene.Axon.Weights.Count; i++)
+                {
+                    toReturn.Axon.Weights.Add(gene.Axon.Weights[i]);
+                }
+                int delta = desiredNumberOfTerminals - gene.Axon.Weights.Count;
+                for (int j = 0; j < delta; j++)
+                {
+                    toReturn.Axon.Weights.Add(_weightInitializer.InitializeWeight());
+                }
+            }
+            else
+            {
+                for (int i = 0; i < desiredNumberOfTerminals; i++)
+                {
+                    toReturn.Axon.Weights.Add(gene.Axon.Weights[i]);
+                }
+            }
+
+            return toReturn;
         }
 
         internal IList<double> MateAxonWeights(NeuronGene moreTerminals, NeuronGene lessTerminals, Random random)
@@ -188,5 +236,5 @@ namespace UnsupervisedTraining
 
             return toReturn;
         }
-    }   
+    }
 }

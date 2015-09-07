@@ -18,7 +18,7 @@ namespace Trainer
             {
                 NumInputNeurons = 1,
                 NumOutputNeurons = 1,
-                NumHiddenLayers = 1,
+                NumHiddenLayers = 2,
                 NumHiddenNeurons = 3,
                 SummationFunction = new SimpleSummation(),
                 ActivationFunction = new TanhActivationFunction()
@@ -38,7 +38,7 @@ namespace Trainer
             };
             var random = new RandomWeightInitializer(new Random());
             INeuralNetworkFactory factory = NeuralNetworkFactory.GetInstance(SomaFactory.GetInstance(networkConfig.SummationFunction), AxonFactory.GetInstance(networkConfig.ActivationFunction), SynapseFactory.GetInstance(new RandomWeightInitializer(new Random())), SynapseFactory.GetInstance(new ConstantWeightInitializer(1.0)), random);
-            IBreeder breeder = new Breeder(factory);
+            IBreeder breeder = new Breeder(factory, random);
             IMutator mutator = new Mutator(factory, random);
             IEvalWorkingSet history = new EvalWorkingSet(50);
 
