@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ArtificialNeuralNetwork;
 using Logging;
+using UnsupervisedTraining.Evaluatable;
 
 namespace UnsupervisedTraining
 {

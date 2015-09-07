@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UnsupervisedTraining
+namespace UnsupervisedTraining.Utils
 {
     public class NeuralNetworkLoader : INeuralNetworkLoader
     {

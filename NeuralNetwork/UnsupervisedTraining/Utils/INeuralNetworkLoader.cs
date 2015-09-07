@@ -1,6 +1,6 @@
 ﻿using ArtificialNeuralNetwork;
 using System;
-namespace UnsupervisedTraining
+namespace UnsupervisedTraining.Utils
 {
     interface INeuralNetworkLoader
     {
