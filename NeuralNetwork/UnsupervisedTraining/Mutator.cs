@@ -15,11 +15,13 @@ namespace UnsupervisedTraining
     {
         private readonly INeuralNetworkFactory _networkFactory;
         private readonly IWeightInitializer _weightInitializer;
+        private readonly MutationConfigurationSettings _config;
 
-        public Mutator(INeuralNetworkFactory networkFactory, IWeightInitializer weightInitializer)
+        public Mutator(INeuralNetworkFactory networkFactory, IWeightInitializer weightInitializer, MutationConfigurationSettings config)
         {
             _networkFactory = networkFactory;
             _weightInitializer = weightInitializer;
+            _config = config;
         }
 
         public IList<INeuralNetwork> Mutate(IList<INeuralNetwork> networks, double mutateChance)
@@ -29,7 +31,10 @@ namespace UnsupervisedTraining
             foreach (INeuralNetwork net in networks)
             {
                 NeuralNetworkGene childGenes = net.GetGenes();
-                childGenes = TryAddLayerToNetwork(childGenes, mutateChance, random);
+                if (_config.MutateNumberOfHiddenLayers)
+                {
+                    childGenes = TryAddLayerToNetwork(childGenes, mutateChance, random);
+                }
 
                 for (int n = 0; n < childGenes.InputGene.Neurons.Count; n++)
                 {
@@ -39,7 +44,11 @@ namespace UnsupervisedTraining
 
                 for (int h = 0; h < childGenes.HiddenGenes.Count; h++)
                 {
-                    childGenes.HiddenGenes[h] = TryAddNeuronsToLayer(childGenes, h, mutateChance, random);
+                    if (_config.MutateNumberOfHiddenNeuronsInLayer)
+                    {
+                        childGenes.HiddenGenes[h] = TryAddNeuronsToLayer(childGenes, h, mutateChance, random);
+                    }
+
                     for (int j = 0; j < childGenes.HiddenGenes[h].Neurons.Count; j++)
                     {
                         var neuron = childGenes.HiddenGenes[h].Neurons[j];
@@ -112,7 +121,7 @@ namespace UnsupervisedTraining
             //weights
             for (int j = 0; j < gene.Axon.Weights.Count; j++)
             {
-                if (random.NextDouble() <= mutateChance)
+                if (_config.MutateSynapseWeights && random.NextDouble() <= mutateChance)
                 {
                     double val = random.NextDouble();
                     if (random.NextDouble() < 0.5)
@@ -128,8 +137,9 @@ namespace UnsupervisedTraining
                 }
             }
 
+
             //bias
-            if (random.NextDouble() <= mutateChance)
+            if (_config.MutateSomaBiasFunction && random.NextDouble() <= mutateChance)
             {
                 double val = random.NextDouble();
                 if (random.NextDouble() < 0.5)
@@ -145,7 +155,7 @@ namespace UnsupervisedTraining
             }
 
             //activation
-            if (random.NextDouble() <= mutateChance)
+            if (_config.MutateAxonActivationFunction && random.NextDouble() <= mutateChance)
             {
                 toReturn.Axon.ActivationFunction = GetRandomActivationFunction(random).GetType();
             }
@@ -155,7 +165,7 @@ namespace UnsupervisedTraining
             }
 
             //summation
-            if (random.NextDouble() <= mutateChance)
+            if (_config.MutateSomaSummationFunction && random.NextDouble() <= mutateChance)
             {
                 toReturn.Soma.SummationFunction = GetRandomSummationFunction(random).GetType();
             }

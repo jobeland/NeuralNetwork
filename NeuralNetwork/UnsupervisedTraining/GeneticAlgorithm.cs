@@ -6,6 +6,7 @@ using BasicGame;
 using Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -85,29 +86,11 @@ namespace UnsupervisedTraining
 
         private void createNextGeneration()
         {
-            /*
-             * TODO: get top 10% of current generation, save them rank the top 10%
-             * by giving them a weight (ie if top three had 25, 24, and 23 evals,
-             * the weight for the 25 would be 25 / (25+24+23))
-             * 
-             * for a certain percentage of the new generation, create by breeding
-             * choose 2 mates stochasticly, then mix their weights (stochastically
-             * as well, 50/50 chance?) // 70%?
-             * 
-             *  for a certain percentage of the new
-             * generation, keep top performers of old generation (again, chosen
-             * stochastically) // 10%? so keep them all? 
-             * 
-             * for a certain percentage of
-             * the new generation, mutate top performers of old generation (chosen
-             * stochastically, mutate values chosen at random with 5% chance of mutation) // 20%?
-             * 
-             * Also add brand new ones just to mix things up a bit and prevent a local maxima?
-             */
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
 
             int numberOfTopPerformersToChoose = (int)(_generationConfig.GenerationPopulation * 0.50);
             int numToBreed = (int)(_generationConfig.GenerationPopulation * 0.35);
-            //int numToMutate = (int)(_generationConfig.GenerationPopulation * 0.1);
             int numToGen = (int)(_generationConfig.GenerationPopulation * 0.15);
 
             var sessions = _generation.GetBestPerformers(numberOfTopPerformersToChoose);
@@ -153,11 +136,13 @@ namespace UnsupervisedTraining
             }
             _generation = new Generation(newSessions, _generationConfig);
 
+            watch.Stop();
+            LoggerFactory.GetLogger().Log(LogLevel.Debug, string.Format("create generation runtime (sec): {0}", watch.Elapsed.TotalSeconds));
+            watch.Reset();
         }
 
         private List<INeuralNetwork> getNewNetworks(int numToGen)
         {
-            //TODO: have these new networks generated not according to config: random hidden neurons/layers, and random functions
             List<INeuralNetwork> newNets = new List<INeuralNetwork>();
             for (int i = 0; i < numToGen; i++)
             {

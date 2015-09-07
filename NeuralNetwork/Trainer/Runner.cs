@@ -26,8 +26,7 @@ namespace Trainer
             GenerationConfigurationSettings generationSettings = new GenerationConfigurationSettings
             {
                 UseMultithreading = true,
-                GenerationPopulation = 100
-
+                GenerationPopulation = 1000
             };
             EvolutionConfigurationSettings evolutionSettings = new EvolutionConfigurationSettings
             {
@@ -36,10 +35,19 @@ namespace Trainer
                 GenerationsPerEpoch = 10,
                 NumEpochs = 1000
             };
+            MutationConfigurationSettings mutationSettings = new MutationConfigurationSettings
+            {
+                MutateAxonActivationFunction = true,
+                MutateNumberOfHiddenLayers = true,
+                MutateNumberOfHiddenNeuronsInLayer = true,
+                MutateSomaBiasFunction = true,
+                MutateSomaSummationFunction = true,
+                MutateSynapseWeights = true
+            };
             var random = new RandomWeightInitializer(new Random());
             INeuralNetworkFactory factory = NeuralNetworkFactory.GetInstance(SomaFactory.GetInstance(networkConfig.SummationFunction), AxonFactory.GetInstance(networkConfig.ActivationFunction), SynapseFactory.GetInstance(new RandomWeightInitializer(new Random())), SynapseFactory.GetInstance(new ConstantWeightInitializer(1.0)), random);
             IBreeder breeder = new Breeder(factory, random);
-            IMutator mutator = new Mutator(factory, random);
+            IMutator mutator = new Mutator(factory, random, mutationSettings);
             IEvalWorkingSet history = new EvalWorkingSet(50);
 
             GeneticAlgorithm evolver = new GeneticAlgorithm(networkConfig, generationSettings, evolutionSettings, factory, breeder, mutator, history);
