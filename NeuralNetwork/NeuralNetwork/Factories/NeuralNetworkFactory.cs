@@ -1,5 +1,6 @@
 ﻿using ArtificialNeuralNetwork.ActivationFunctions;
 using ArtificialNeuralNetwork.Genes;
+using ArtificialNeuralNetwork.WeightInitializer;
 using System;
 using System.Collections;
 using System.Collections.Generic;

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ArtificialNeuralNetwork
+namespace ArtificialNeuralNetwork.WeightInitializer
 {
     public class ConstantWeightInitializer : IWeightInitializer
     {

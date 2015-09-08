@@ -1,6 +1,7 @@
 ﻿using ArtificialNeuralNetwork;
 using ArtificialNeuralNetwork.ActivationFunctions;
 using ArtificialNeuralNetwork.Factories;
+using ArtificialNeuralNetwork.WeightInitializer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
