@@ -51,10 +51,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BasicGame\BasicGame.csproj">
-      <Project>{6413cd24-b15c-4996-8e42-e8f85766b24e}</Project>
-      <Name>BasicGame</Name>
-    </ProjectReference>
     <ProjectReference Include="..\NeuralNetwork\NeuralNetwork.csproj">
       <Project>{31e24d6e-afcf-4522-aeba-ccccd817bb85}</Project>
       <Name>NeuralNetwork</Name>
