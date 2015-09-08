@@ -32,6 +32,17 @@ namespace ArtificialNeuralNetwork.Factories
             return new NeuralNetworkFactory(somaFactory, axonFactory, hiddenSynapseFactory, inputOutputSynapseFactory, biasInitializer);
         }
 
+        public static NeuralNetworkFactory GetInstance()
+        {
+            var somaFactory = SomaFactory.GetInstance(new SimpleSummation());
+            var axonFactory = AxonFactory.GetInstance(new TanhActivationFunction());
+            var random = new Random();
+            var randomInit = new RandomWeightInitializer(random);
+            var synapseFactory = SynapseFactory.GetInstance(randomInit);
+            var ioSynapseFactory = SynapseFactory.GetInstance(new ConstantWeightInitializer(1.0));
+            return new NeuralNetworkFactory(somaFactory, axonFactory, synapseFactory, ioSynapseFactory, randomInit);
+        }
+
         internal INeuron CreateNeuron(Dictionary<int, Dictionary<int, IList<Synapse>>> mapping, int layerIndex, int neuronIndex)
         {
             var dendrites = (layerIndex > 0) ? getDendritesForSoma(layerIndex, neuronIndex, mapping) : mapping[layerIndex][neuronIndex];
