@@ -148,7 +148,6 @@ namespace ArtificialNeuralNetwork.Factories
             IList<Synapse> dendrites = new List<Synapse>();
             foreach (var neuron in neuronMappings.Keys)
             {
-                //TODO: this fails sometimes when using multiple hidden layers
                 dendrites.Add(neuronMappings[neuron][terminalIndexInNeuron]);
             }
 

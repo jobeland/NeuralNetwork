@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>jobeland</authors>
+    <owners>jobeland</owners>
+    <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
+    <projectUrl>https://github.com/jobeland/NeuralNetwork</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A .Net implementation of an artificial neural network</description>
+    <releaseNotes>Beta version</releaseNotes>
+    <copyright>Copyright 2015</copyright>
+  </metadata>
+</package>

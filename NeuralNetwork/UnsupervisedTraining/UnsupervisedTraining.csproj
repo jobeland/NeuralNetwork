@@ -31,6 +31,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Logging, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\JoBeland.Logging.1.0.0.0\lib\net45\Logging.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -70,10 +78,6 @@
     <Compile Include="WeightedSessionList.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Logging\Logging.csproj">
-      <Project>{3e71ff3f-fa56-45eb-a8fb-43b87b466826}</Project>
-      <Name>Logging</Name>
-    </ProjectReference>
     <ProjectReference Include="..\NeuralNetwork\NeuralNetwork.csproj">
       <Project>{31e24d6e-afcf-4522-aeba-ccccd817bb85}</Project>
       <Name>NeuralNetwork</Name>
