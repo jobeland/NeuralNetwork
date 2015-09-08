@@ -14,13 +14,14 @@ namespace UnsupervisedTraining.Evolution
     {
         private readonly INeuralNetworkFactory _networkFactory;
         private readonly IWeightInitializer _weightInitializer;
-        private const double MOTHER_FATHER_BIAS = 0.5;
+        private double _motherFatherBias;
 
 
-        public Breeder(INeuralNetworkFactory networkFactory, IWeightInitializer weightInitializer)
+        public Breeder(INeuralNetworkFactory networkFactory, IWeightInitializer weightInitializer, double motherFatherBias = 0.5)
         {
             _networkFactory = networkFactory;
             _weightInitializer = weightInitializer;
+            _motherFatherBias = motherFatherBias;
         }
 
         public IList<INeuralNetwork> Breed(IList<ITrainingSession> sessions, int numToBreed)
@@ -179,7 +180,7 @@ namespace UnsupervisedTraining.Evolution
             var weights = new List<double>();
             for (int j = 0; j < moreTerminals.Axon.Weights.Count; j++)
             {
-                if (random.NextDouble() < MOTHER_FATHER_BIAS && j < lessTerminals.Axon.Weights.Count)
+                if (random.NextDouble() < _motherFatherBias && j < lessTerminals.Axon.Weights.Count)
                 {
                     weights.Add(lessTerminals.Axon.Weights[j]);
                 }
@@ -208,7 +209,7 @@ namespace UnsupervisedTraining.Evolution
                 toReturn.Axon.Weights = MateAxonWeights(mother, father, random);
             }
 
-            if (random.NextDouble() < MOTHER_FATHER_BIAS)
+            if (random.NextDouble() < _motherFatherBias)
             {
                 toReturn.Axon.ActivationFunction = mother.Axon.ActivationFunction;
             }
@@ -217,7 +218,7 @@ namespace UnsupervisedTraining.Evolution
                 toReturn.Axon.ActivationFunction = father.Axon.ActivationFunction;
             }
 
-            if (random.NextDouble() < MOTHER_FATHER_BIAS)
+            if (random.NextDouble() < _motherFatherBias)
             {
                 toReturn.Soma.SummationFunction = mother.Soma.SummationFunction;
             }
@@ -226,7 +227,7 @@ namespace UnsupervisedTraining.Evolution
                 toReturn.Soma.SummationFunction = father.Soma.SummationFunction;
             }
 
-            if (random.NextDouble() < MOTHER_FATHER_BIAS)
+            if (random.NextDouble() < _motherFatherBias)
             {
                 toReturn.Soma.Bias = mother.Soma.Bias;
             }
