@@ -13,7 +13,7 @@ namespace ArtificialNeuralNetwork
             double sum = bias;
             foreach (Synapse synapse in dendrites)
             {
-                sum += synapse.Value * synapse.Weight;
+                sum += synapse.Axon.Value * synapse.Weight;
             }
             return sum;
         }

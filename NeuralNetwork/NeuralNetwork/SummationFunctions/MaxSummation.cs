@@ -13,7 +13,7 @@ namespace ArtificialNeuralNetwork.SummationFunctions
             double max = bias;
             foreach (Synapse synapse in dendrites)
             {
-                var weightedValue = synapse.Value * synapse.Weight;
+                var weightedValue = synapse.Axon.Value * synapse.Weight;
                 if (weightedValue > max)
                 {
                     max = weightedValue;

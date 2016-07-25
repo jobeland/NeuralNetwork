@@ -13,7 +13,7 @@ namespace ArtificialNeuralNetwork.SummationFunctions
             double min = bias;
             foreach (Synapse synapse in dendrites)
             {
-                var weightedValue = synapse.Value * synapse.Weight;
+                var weightedValue = synapse.Axon.Value * synapse.Weight;
                 if (weightedValue < min)
                 {
                     min = weightedValue;

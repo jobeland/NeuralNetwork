@@ -17,7 +17,7 @@ namespace ArtificialNeuralNetwork.SummationFunctions
             }
             foreach (Synapse synapse in dendrites)
             {
-                average += synapse.Value * synapse.Weight;
+                average += synapse.Axon.Value * synapse.Weight;
             }
             return average / dendrites.Count;
         }
