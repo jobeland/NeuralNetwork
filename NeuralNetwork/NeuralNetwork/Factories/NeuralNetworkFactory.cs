@@ -38,8 +38,8 @@ namespace ArtificialNeuralNetwork.Factories
             var axonFactory = AxonFactory.GetInstance(new TanhActivationFunction());
             var random = new Random();
             var randomInit = new RandomWeightInitializer(random);
-            var synapseFactory = SynapseFactory.GetInstance(randomInit);
-            var ioSynapseFactory = SynapseFactory.GetInstance(new ConstantWeightInitializer(1.0));
+            var synapseFactory = SynapseFactory.GetInstance(randomInit, axonFactory);
+            var ioSynapseFactory = SynapseFactory.GetInstance(new ConstantWeightInitializer(1.0), AxonFactory.GetInstance(new IdentityActivationFunction()));
             return new NeuralNetworkFactory(somaFactory, axonFactory, synapseFactory, ioSynapseFactory, randomInit);
         }
 

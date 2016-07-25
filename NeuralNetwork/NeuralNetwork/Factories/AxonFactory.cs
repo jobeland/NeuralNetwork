@@ -26,6 +26,11 @@ namespace ArtificialNeuralNetwork.Factories
             return Axon.GetInstance(terminals, _activationFunction);
         }
 
+        public IAxon Create()
+        {
+            return Axon.GetInstance(new List<Synapse>(), _activationFunction);
+        }
+
         public IAxon Create(IList<Synapse> terminals, Type activationFunction)
         {
             if (activationFunction == typeof(AbsoluteXActivationFunction))
