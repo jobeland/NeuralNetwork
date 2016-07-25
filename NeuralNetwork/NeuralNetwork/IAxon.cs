@@ -5,6 +5,7 @@ namespace ArtificialNeuralNetwork
     public interface IAxon
     {
         void ProcessSignal(double signal);
+        double Value { get; }
         AxonGene GetGenes();
     }
 }
