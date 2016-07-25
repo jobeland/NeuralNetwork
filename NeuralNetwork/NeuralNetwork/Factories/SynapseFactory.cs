@@ -1,9 +1,4 @@
 ﻿using ArtificialNeuralNetwork.WeightInitializer;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ArtificialNeuralNetwork.Factories
 {
@@ -25,7 +20,6 @@ namespace ArtificialNeuralNetwork.Factories
         {
             return new Synapse
             {
-                Value = 0.0,
                 Weight = _weightInitializer.InitializeWeight()
             };
         }
@@ -34,7 +28,6 @@ namespace ArtificialNeuralNetwork.Factories
         {
             return new Synapse
             {
-                Value = 0.0,
                 Weight = weight
             };
         }
