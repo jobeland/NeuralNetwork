@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <Configuration>Release</Configuration>
+        <Platform>AnyCPU</Platform>
+        <ProjectFile>..\NeuralNetwork.csproj</ProjectFile>
+    </PropertyGroup>
+
+    <Target Name="Clean">
+        <MSBuild Targets="Clean"
+                 Projects="$(ProjectFile)"
+                 Properties="Configuration=$(Configuration);Platform=$(Platform)" />
+    </Target>
+
+    <Target Name="Build">
+        <MSBuild Targets="Build"
+                 Projects="$(ProjectFile)"
+                 Properties="Configuration=$(Configuration);Platform=$(Platform)" />
+    </Target>
+
+    <Target Name="Package" DependsOnTargets="Build">
+        <ItemGroup>
+            <!-- Find the NuGet packages, but exclude any symbols packages as NuGet will push symbol packages automatically -->
+            <NuGetPackages Include="*.nupkg" Exclude="*.symbols.nupkg" />
+        </ItemGroup>
+        <Delete Files="@(NuGetPackages)" />
+        <Exec Command="nuget pack $(ProjectFile) -Properties Configuration=$(Configuration) -IncludeReferencedProjects" />
+    </Target>
+
+    <Target Name="Publish" DependsOnTargets="Package">
+		<ItemGroup>
+            <!-- Find the NuGet packages, but exclude any symbols packages as NuGet will push symbol packages automatically -->
+            <NuGetPackages Include="*.nupkg" Exclude="*.symbols.nupkg" />
+        </ItemGroup>
+        <Exec Command="nuget push %(NuGetPackages.Identity) -Source https://www.nuget.org/api/v2/package -Verbosity Detailed" />
+    </Target>
+</Project>
