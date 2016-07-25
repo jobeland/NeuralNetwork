@@ -41,7 +41,7 @@ namespace ArtificialNeuralNetwork
             }
             for (int i = 0; i < _inputs.Count; i++)
             {
-                _inputs[i].Value = inputs[i];
+                _inputs[i].Axon.ProcessSignal(inputs[i]);
             }
         }
 
@@ -59,7 +59,7 @@ namespace ArtificialNeuralNetwork
         {
             double[] outputs = new double[_outputs.Count];
             for(var i = 0; i < _outputs.Count; i++){
-                outputs[i] = _outputs[i].Value;
+                outputs[i] = _outputs[i].Axon.Value;
             }
             return outputs;
         }
