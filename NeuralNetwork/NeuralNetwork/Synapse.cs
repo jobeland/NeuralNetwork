@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ArtificialNeuralNetwork
+﻿namespace ArtificialNeuralNetwork
 {
     public class Synapse
     {
-        public double Value { get; set; }
+        public IAxon Axon { get; set; }
 
         public double Weight { get; set; }
     }
