@@ -12,11 +12,11 @@ namespace ArtificialNeuralNetwork.Factories
 {
     public class NeuralNetworkFactory : INeuralNetworkFactory
     {
-        private ISomaFactory _somaFactory;
-        private IAxonFactory _axonFactory;
-        private ISynapseFactory _hiddenSynapseFactory;
-        private ISynapseFactory _inputOutputSynapseFactory;
-        private IWeightInitializer _biasInitiliazer;
+        private readonly ISomaFactory _somaFactory;
+        private readonly IAxonFactory _axonFactory;
+        private readonly ISynapseFactory _hiddenSynapseFactory;
+        private readonly ISynapseFactory _inputOutputSynapseFactory;
+        private readonly IWeightInitializer _biasInitiliazer;
 
         private NeuralNetworkFactory(ISomaFactory somaFactory, IAxonFactory axonFactory, ISynapseFactory hiddenSynapseFactory, ISynapseFactory inputOutputSynapseFactory, IWeightInitializer biasInitializer)
         {
