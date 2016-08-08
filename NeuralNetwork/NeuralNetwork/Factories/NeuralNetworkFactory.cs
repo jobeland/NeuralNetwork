@@ -102,7 +102,29 @@ namespace ArtificialNeuralNetwork.Factories
             return NeuralNetwork.GetInstance(inputs, inputLayer, hiddenLayers, outputLayer, outputs);
         }
 
-        internal Dictionary<int, Dictionary<int, IList<Synapse>>> CreateSynapses(int numInputs, int numOutputs, int numHiddenLayers, int numHiddenPerLayer)
+        public INeuralNetwork Create(int numInputs, int numOutputs, IList<int> hiddenLayerSpecs)
+        {
+            //layer number + position in layer --> list of terminals
+            var mapping = CreateSynapses(numInputs, numOutputs, hiddenLayerSpecs);
+
+            var inputs = GetAllSynapsesFromLayerMapping(mapping[0]);
+            var outputs = GetAllSynapsesFromLayerMapping(mapping[mapping.Keys.Count - 1]);
+
+            ILayer inputLayer = CreateLayer(mapping, 0, numInputs);
+
+            //Hidden layers
+            IList<ILayer> hiddenLayers = new List<ILayer>();
+            for (int h = 0; h < hiddenLayerSpecs.Count; h++)
+            {
+                hiddenLayers.Add(CreateLayer(mapping, h + 1, hiddenLayerSpecs[h]));
+            }
+
+            ILayer outputLayer = CreateLayer(mapping, hiddenLayerSpecs.Count + 1, numOutputs);
+
+            return NeuralNetwork.GetInstance(inputs, inputLayer, hiddenLayers, outputLayer, outputs);
+        }
+
+        internal Dictionary<int, Dictionary<int, IList<Synapse>>> CreateSynapses(int numInputs, int numOutputs, IList<int> hiddenLayerSpecs)
         {
             //layer number + position in layer --> list of terminals
             var mapping = new Dictionary<int, Dictionary<int, IList<Synapse>>>();
@@ -111,21 +133,31 @@ namespace ArtificialNeuralNetwork.Factories
             mapping[0] = CreateSynapseMapLayer(_inputOutputSynapseFactory, numInputs, 1);
 
             //Input neuron terminals
-            mapping[1] = CreateSynapseMapLayer(_hiddenSynapseFactory, numInputs, numHiddenPerLayer);
+            mapping[1] = CreateSynapseMapLayer(_hiddenSynapseFactory, numInputs, hiddenLayerSpecs[0]);
 
             //Hidden layers 0 to (n-1)
-            for (int h = 0; h < numHiddenLayers - 1; h++)
+            for (var h = 0; h < hiddenLayerSpecs.Count - 1; h++)
             {
-                mapping[h + 2] = CreateSynapseMapLayer(_hiddenSynapseFactory, numHiddenPerLayer, numHiddenPerLayer);
+                mapping[h + 2] = CreateSynapseMapLayer(_hiddenSynapseFactory, hiddenLayerSpecs[h], hiddenLayerSpecs[h+1]);
             }
 
             //Hidden layer n
-            mapping[numHiddenLayers + 1] = CreateSynapseMapLayer(_hiddenSynapseFactory, numHiddenPerLayer, numOutputs);
+            mapping[hiddenLayerSpecs.Count + 1] = CreateSynapseMapLayer(_hiddenSynapseFactory, hiddenLayerSpecs[hiddenLayerSpecs.Count - 1], numOutputs);
 
             //Output layer
-            mapping[numHiddenLayers + 2] = CreateSynapseMapLayer(_inputOutputSynapseFactory, numOutputs, 1);
+            mapping[hiddenLayerSpecs.Count + 2] = CreateSynapseMapLayer(_inputOutputSynapseFactory, numOutputs, 1);
 
             return mapping;
+        }
+
+        internal Dictionary<int, Dictionary<int, IList<Synapse>>> CreateSynapses(int numInputs, int numOutputs, int numHiddenLayers, int numHiddenPerLayer)
+        {
+            var hiddenSpecs = new List<int>();
+            for (var i = 0; i < numHiddenLayers; i++)
+            {
+                hiddenSpecs.Add(numHiddenPerLayer);
+            }
+            return CreateSynapses(numInputs, numOutputs, hiddenSpecs);
         }
 
         internal Dictionary<int, IList<Synapse>> CreateSynapseMapLayer(ISynapseFactory synapseFactory, int numberOfNeuronsInLayer, int numberOfTerminalsPerNeuron)
