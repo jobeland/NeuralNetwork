@@ -33,42 +33,14 @@ namespace ArtificialNeuralNetwork.Factories
 
         public IAxon Create(IList<Synapse> terminals, Type activationFunction)
         {
-            if (activationFunction == typeof(AbsoluteXActivationFunction))
+            var functionObj = Activator.CreateInstance(activationFunction);
+            if (!(functionObj is IActivationFunction))
             {
-                return Axon.GetInstance(terminals, new AbsoluteXActivationFunction());
+                throw new NotSupportedException(
+                    $"{activationFunction} is not a supported activation function type for Create() as it does not implement IActivationFunction");
             }
-            else if (activationFunction == typeof(IdentityActivationFunction))
-            {
-                return Axon.GetInstance(terminals, new IdentityActivationFunction());
-            }
-            else if (activationFunction == typeof(InverseActivationFunction))
-            {
-                return Axon.GetInstance(terminals, new InverseActivationFunction());
-            }
-            else if (activationFunction == typeof(SechActivationFunction))
-            {
-                return Axon.GetInstance(terminals, new SechActivationFunction());
-            }
-            else if (activationFunction == typeof(SigmoidActivationFunction))
-            {
-                return Axon.GetInstance(terminals, new SigmoidActivationFunction());
-            }
-            else if (activationFunction == typeof(SinhActivationFunction))
-            {
-                return Axon.GetInstance(terminals, new SinhActivationFunction());
-            }
-            else if (activationFunction == typeof(StepActivationFunction))
-            {
-                return Axon.GetInstance(terminals, new StepActivationFunction());
-            }
-            else if (activationFunction == typeof(TanhActivationFunction))
-            {
-                return Axon.GetInstance(terminals, new TanhActivationFunction());
-            }
-            else
-            {
-                throw new NotSupportedException(string.Format("{0} is not a supported activation function type for Create()", activationFunction));
-            }
+            var function = functionObj as IActivationFunction;
+            return Axon.GetInstance(terminals, function);
         }
     }
 }
