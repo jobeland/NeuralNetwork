@@ -7,8 +7,8 @@ namespace ArtificialNeuralNetwork
 {
     public class Axon : IAxon
     {
-        public IList<Synapse> Terminals;
-        public IActivationFunction ActivationFunction;
+        public IList<Synapse> Terminals { get; set; }
+        public IActivationFunction ActivationFunction { get; set; }
         public double Value { get; private set; }
 
         private Axon(IList<Synapse> terminals, IActivationFunction activationFunction)

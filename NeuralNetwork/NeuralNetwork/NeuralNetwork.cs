@@ -9,11 +9,11 @@ namespace ArtificialNeuralNetwork
     [Serializable]
     public class NeuralNetwork : INeuralNetwork
     {
-        public ILayer InputLayer;
-        public IList<ILayer> HiddenLayers;
-        public ILayer OutputLayer;
-        public IList<Synapse> Inputs;
-        public IList<Synapse> Outputs;
+        public ILayer InputLayer { get; set; }
+        public IList<ILayer> HiddenLayers { get; set; }
+        public ILayer OutputLayer { get; set; }
+        public IList<Synapse> Inputs { get; set; }
+        public IList<Synapse> Outputs { get; set; }
 
         private NeuralNetwork(IList<Synapse> inputs, ILayer inputLayer, IList<ILayer> hiddenLayers, ILayer outputLayer, IList<Synapse> outputs)
         {

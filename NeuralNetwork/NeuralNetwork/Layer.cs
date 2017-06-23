@@ -9,7 +9,7 @@ namespace ArtificialNeuralNetwork
     [Serializable]
     public class Layer : ILayer
     {
-        public IList<INeuron> NeuronsInLayer;
+        public IList<INeuron> NeuronsInLayer { get; set; }
 
         private Layer(IList<INeuron> neuronsInLayer)
         {

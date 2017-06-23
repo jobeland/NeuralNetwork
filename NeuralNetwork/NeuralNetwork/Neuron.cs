@@ -6,8 +6,8 @@ namespace ArtificialNeuralNetwork
     [Serializable]
     public class Neuron : INeuron
     {
-        public ISoma Soma;
-        public IAxon Axon;
+        public ISoma Soma { get; set; }
+        public IAxon Axon { get; set; }
 
         private Neuron(ISoma soma, IAxon axon)
         {

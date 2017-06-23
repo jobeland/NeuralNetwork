@@ -5,9 +5,9 @@ namespace ArtificialNeuralNetwork
 {
     public class Soma : ISoma
     {
-        public IList<Synapse> Dendrites;
-        public ISummationFunction SummationFunction;
-        public double Bias;
+        public IList<Synapse> Dendrites { get; set; }
+        public ISummationFunction SummationFunction { get; set; }
+        public double Bias { get; set; }
 
         private Soma(IList<Synapse> dendrites, ISummationFunction summationFunction, double bias)
         {
