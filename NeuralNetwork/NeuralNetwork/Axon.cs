@@ -7,14 +7,14 @@ namespace ArtificialNeuralNetwork
 {
     public class Axon : IAxon
     {
-        private readonly IList<Synapse> _terminals;
-        private readonly IActivationFunction _activationFunction;
+        public IList<Synapse> Terminals;
+        public IActivationFunction ActivationFunction;
         public double Value { get; private set; }
 
         private Axon(IList<Synapse> terminals, IActivationFunction activationFunction)
         {
-            _activationFunction = activationFunction;
-            _terminals = terminals;
+            ActivationFunction = activationFunction;
+            Terminals = terminals;
             Value = 0.0;
             foreach (var synapse in terminals)
             {
@@ -34,15 +34,15 @@ namespace ArtificialNeuralNetwork
 
         internal double calculateActivation(double signal)
         {
-            return _activationFunction.CalculateActivation(signal);
+            return ActivationFunction.CalculateActivation(signal);
         }
 
         public AxonGene GetGenes()
         {
             return new AxonGene
             {
-                ActivationFunction = _activationFunction.GetType(),
-                Weights = _terminals.Select(d => d.Weight).ToList()
+                ActivationFunction = ActivationFunction.GetType(),
+                Weights = Terminals.Select(d => d.Weight).ToList()
             };
         }
 

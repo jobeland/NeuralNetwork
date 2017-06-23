@@ -1,10 +1,7 @@
-﻿using ArtificialNeuralNetwork.ActivationFunctions;
-using ArtificialNeuralNetwork.Genes;
+﻿using ArtificialNeuralNetwork.Genes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ArtificialNeuralNetwork
 {
@@ -12,11 +9,11 @@ namespace ArtificialNeuralNetwork
     [Serializable]
     public class Layer : ILayer
     {
-        private readonly IList<INeuron> _neuronsInLayer;
+        public IList<INeuron> NeuronsInLayer;
 
         private Layer(IList<INeuron> neuronsInLayer)
         {
-            _neuronsInLayer = neuronsInLayer;
+            NeuronsInLayer = neuronsInLayer;
         }
 
         public static ILayer GetInstance(IList<INeuron> neuronsInLayer)
@@ -26,7 +23,7 @@ namespace ArtificialNeuralNetwork
 
         public void Process()
         {
-            foreach (INeuron n in _neuronsInLayer)
+            foreach (INeuron n in NeuronsInLayer)
             {
                 n.Process();
             }
@@ -36,7 +33,7 @@ namespace ArtificialNeuralNetwork
         {
             return new LayerGene
             {
-                Neurons = _neuronsInLayer.Select(n => n.GetGenes()).ToList()
+                Neurons = NeuronsInLayer.Select(n => n.GetGenes()).ToList()
             };
         }
     }

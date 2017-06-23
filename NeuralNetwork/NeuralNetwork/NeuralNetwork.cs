@@ -1,10 +1,7 @@
-﻿using ArtificialNeuralNetwork.ActivationFunctions;
-using ArtificialNeuralNetwork.Genes;
+﻿using ArtificialNeuralNetwork.Genes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ArtificialNeuralNetwork
 {
@@ -12,20 +9,19 @@ namespace ArtificialNeuralNetwork
     [Serializable]
     public class NeuralNetwork : INeuralNetwork
     {
-
-        private ILayer _inputLayer;
-        private IList<ILayer> _hiddenLayers;
-        private ILayer _outputLayer;
-        private IList<Synapse> _inputs;
-        private IList<Synapse> _outputs;
+        public ILayer InputLayer;
+        public IList<ILayer> HiddenLayers;
+        public ILayer OutputLayer;
+        public IList<Synapse> Inputs;
+        public IList<Synapse> Outputs;
 
         private NeuralNetwork(IList<Synapse> inputs, ILayer inputLayer, IList<ILayer> hiddenLayers, ILayer outputLayer, IList<Synapse> outputs)
         {
-            _inputs = inputs;
-            _inputLayer = inputLayer;
-            _hiddenLayers = hiddenLayers;
-            _outputLayer = outputLayer;
-            _outputs = outputs;
+            Inputs = inputs;
+            InputLayer = inputLayer;
+            HiddenLayers = hiddenLayers;
+            OutputLayer = outputLayer;
+            Outputs = outputs;
         }
 
         public static INeuralNetwork GetInstance(IList<Synapse> inputs, ILayer inputLayer, IList<ILayer> hiddenLayers, ILayer outputLayer, IList<Synapse> outputs)
@@ -35,31 +31,31 @@ namespace ArtificialNeuralNetwork
 
         public void SetInputs(double[] inputs)
         {
-            if (inputs.Length != _inputs.Count)
+            if (inputs.Length != Inputs.Count)
             {
-                throw new ArgumentException(string.Format("inputs of length: {0} does not match the number of input synapses: {1}", inputs.Length, _inputs.Count));
+                throw new ArgumentException(string.Format("inputs of length: {0} does not match the number of input synapses: {1}", inputs.Length, Inputs.Count));
             }
-            for (int i = 0; i < _inputs.Count; i++)
+            for (int i = 0; i < Inputs.Count; i++)
             {
-                _inputs[i].Axon.ProcessSignal(inputs[i]);
+                Inputs[i].Axon.ProcessSignal(inputs[i]);
             }
         }
 
         public void Process()
         {
-            _inputLayer.Process();
-            foreach (ILayer hiddenLayer in _hiddenLayers)
+            InputLayer.Process();
+            foreach (ILayer hiddenLayer in HiddenLayers)
             {
                 hiddenLayer.Process();
             }
-            _outputLayer.Process();
+            OutputLayer.Process();
         }
 
         public double[] GetOutputs()
         {
-            double[] outputs = new double[_outputs.Count];
-            for(var i = 0; i < _outputs.Count; i++){
-                outputs[i] = _outputs[i].Axon.Value;
+            double[] outputs = new double[Outputs.Count];
+            for(var i = 0; i < Outputs.Count; i++){
+                outputs[i] = Outputs[i].Axon.Value;
             }
             return outputs;
         }
@@ -68,9 +64,9 @@ namespace ArtificialNeuralNetwork
         {
             return new NeuralNetworkGene
             {
-                InputGene = _inputLayer.GetGenes(),
-                HiddenGenes = _hiddenLayers.Select(l => l.GetGenes()).ToList(),
-                OutputGene = _outputLayer.GetGenes()
+                InputGene = InputLayer.GetGenes(),
+                HiddenGenes = HiddenLayers.Select(l => l.GetGenes()).ToList(),
+                OutputGene = OutputLayer.GetGenes()
             };
         }
 
