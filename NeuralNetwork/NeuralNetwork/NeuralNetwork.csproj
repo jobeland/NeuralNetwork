@@ -50,6 +50,8 @@
     <Compile Include="ActivationFunctions\StepActivationFunction.cs" />
     <Compile Include="ActivationFunctions\TanhActivationFunction.cs" />
     <Compile Include="Axon.cs" />
+    <Compile Include="Factories\INeuronFactory.cs" />
+    <Compile Include="Factories\NeuronFactory.cs" />
     <Compile Include="WeightInitializer\ConstantWeightInitializer.cs" />
     <Compile Include="Factories\AxonFactory.cs" />
     <Compile Include="Factories\IAxonFactory.cs" />

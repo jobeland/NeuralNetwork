@@ -13,19 +13,21 @@ namespace ArtificialNeuralNetwork.Factories
         private readonly ISynapseFactory _hiddenSynapseFactory;
         private readonly ISynapseFactory _inputOutputSynapseFactory;
         private readonly IWeightInitializer _biasInitiliazer;
+        private readonly INeuronFactory _neuronFactory;
 
-        private NeuralNetworkFactory(ISomaFactory somaFactory, IAxonFactory axonFactory, ISynapseFactory hiddenSynapseFactory, ISynapseFactory inputOutputSynapseFactory, IWeightInitializer biasInitializer)
+        private NeuralNetworkFactory(ISomaFactory somaFactory, IAxonFactory axonFactory, ISynapseFactory hiddenSynapseFactory, ISynapseFactory inputOutputSynapseFactory, IWeightInitializer biasInitializer, INeuronFactory neuronFactory)
         {
             _somaFactory = somaFactory;
             _axonFactory = axonFactory;
             _hiddenSynapseFactory = hiddenSynapseFactory;
             _inputOutputSynapseFactory = inputOutputSynapseFactory;
             _biasInitiliazer = biasInitializer;
+            _neuronFactory = neuronFactory;
         }
 
-        public static NeuralNetworkFactory GetInstance(ISomaFactory somaFactory, IAxonFactory axonFactory, ISynapseFactory hiddenSynapseFactory, ISynapseFactory inputOutputSynapseFactory, IWeightInitializer biasInitializer)
+        public static NeuralNetworkFactory GetInstance(ISomaFactory somaFactory, IAxonFactory axonFactory, ISynapseFactory hiddenSynapseFactory, ISynapseFactory inputOutputSynapseFactory, IWeightInitializer biasInitializer, INeuronFactory neuronFactory)
         {
-            return new NeuralNetworkFactory(somaFactory, axonFactory, hiddenSynapseFactory, inputOutputSynapseFactory, biasInitializer);
+            return new NeuralNetworkFactory(somaFactory, axonFactory, hiddenSynapseFactory, inputOutputSynapseFactory, biasInitializer, neuronFactory);
         }
 
         public static NeuralNetworkFactory GetInstance()
@@ -36,7 +38,8 @@ namespace ArtificialNeuralNetwork.Factories
             var randomInit = new RandomWeightInitializer(random);
             var synapseFactory = SynapseFactory.GetInstance(randomInit, axonFactory);
             var ioSynapseFactory = SynapseFactory.GetInstance(new ConstantWeightInitializer(1.0), AxonFactory.GetInstance(new IdentityActivationFunction()));
-            return new NeuralNetworkFactory(somaFactory, axonFactory, synapseFactory, ioSynapseFactory, randomInit);
+            var neuronFactory = NeuronFactory.GetInstance();
+            return new NeuralNetworkFactory(somaFactory, axonFactory, synapseFactory, ioSynapseFactory, randomInit, neuronFactory);
         }
 
         internal INeuron CreateNeuron(Dictionary<int, Dictionary<int, IList<Synapse>>> mapping, int layerIndex, int neuronIndex)
@@ -48,7 +51,7 @@ namespace ArtificialNeuralNetwork.Factories
             var terminals = mapping[layerIndex + 1][neuronIndex];
             var axon = _axonFactory.Create(terminals);
 
-            return Neuron.GetInstance(soma, axon);
+            return _neuronFactory.Create(soma, axon);
         }
 
         //Used for input/output lists
@@ -279,7 +282,7 @@ namespace ArtificialNeuralNetwork.Factories
             var terminals = mapping[layerIndex + 1][neuronIndex];
             var axon = _axonFactory.Create(terminals, neuronGene.Axon.ActivationFunction);
 
-            return Neuron.GetInstance(soma, axon);
+            return _neuronFactory.Create(soma, axon);
         }
     }
 }
