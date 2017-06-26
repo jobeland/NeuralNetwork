@@ -8,6 +8,7 @@ namespace ArtificialNeuralNetwork
         public IList<Synapse> Dendrites { get; set; }
         public ISummationFunction SummationFunction { get; set; }
         public double Bias { get; set; }
+        public double Value { get; private set; }
 
         private Soma(IList<Synapse> dendrites, ISummationFunction summationFunction, double bias)
         {
@@ -23,7 +24,7 @@ namespace ArtificialNeuralNetwork
 
         public double CalculateSummation()
         {
-            return SummationFunction.CalculateSummation(Dendrites, Bias);
+            return Value = SummationFunction.CalculateSummation(Dendrites, Bias);
         }
 
         public SomaGene GetGenes()

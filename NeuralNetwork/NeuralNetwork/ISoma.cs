@@ -8,6 +8,7 @@ namespace ArtificialNeuralNetwork
         IList<Synapse> Dendrites { get; set; }
         ISummationFunction SummationFunction { get; set; }
         double Bias { get; set; }
+        double Value { get; }
         double CalculateSummation();
         SomaGene GetGenes();
     }
