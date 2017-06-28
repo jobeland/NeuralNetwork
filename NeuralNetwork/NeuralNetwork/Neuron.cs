@@ -20,7 +20,7 @@ namespace ArtificialNeuralNetwork
             return new Neuron(soma, axon);
         }
 
-        public void Process()
+        public virtual void Process()
         {
             Axon.ProcessSignal(Soma.CalculateSummation());
         }

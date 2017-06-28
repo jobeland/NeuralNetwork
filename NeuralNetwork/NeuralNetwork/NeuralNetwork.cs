@@ -41,7 +41,7 @@ namespace ArtificialNeuralNetwork
             }
         }
 
-        public void Process()
+        public virtual void Process()
         {
             InputLayer.Process();
             foreach (ILayer hiddenLayer in HiddenLayers)

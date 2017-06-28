@@ -27,7 +27,7 @@ namespace ArtificialNeuralNetwork
             return new Axon(terminals, activationFunction);
         }
 
-        public void ProcessSignal(double signal)
+        public virtual void ProcessSignal(double signal)
         {
             Value = calculateActivation(signal);
         }

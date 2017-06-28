@@ -22,7 +22,7 @@ namespace ArtificialNeuralNetwork
             return new Soma(dendrites, summationFunction, bias);
         }
 
-        public double CalculateSummation()
+        public virtual double CalculateSummation()
         {
             return Value = SummationFunction.CalculateSummation(Dendrites, Bias);
         }
