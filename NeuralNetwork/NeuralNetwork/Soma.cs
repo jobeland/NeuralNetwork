@@ -8,7 +8,7 @@ namespace ArtificialNeuralNetwork
         public IList<Synapse> Dendrites { get; set; }
         public ISummationFunction SummationFunction { get; set; }
         public double Bias { get; set; }
-        public double Value { get; private set; }
+        public double Value { get; protected set; }
 
         public Soma(IList<Synapse> dendrites, ISummationFunction summationFunction, double bias)
         {
