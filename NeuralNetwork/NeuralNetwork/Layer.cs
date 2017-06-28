@@ -11,7 +11,7 @@ namespace ArtificialNeuralNetwork
     {
         public IList<INeuron> NeuronsInLayer { get; set; }
 
-        private Layer(IList<INeuron> neuronsInLayer)
+        public Layer(IList<INeuron> neuronsInLayer)
         {
             NeuronsInLayer = neuronsInLayer;
         }

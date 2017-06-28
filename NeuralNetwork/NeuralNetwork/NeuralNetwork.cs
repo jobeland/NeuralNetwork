@@ -15,7 +15,7 @@ namespace ArtificialNeuralNetwork
         public IList<Synapse> Inputs { get; set; }
         public IList<Synapse> Outputs { get; set; }
 
-        private NeuralNetwork(IList<Synapse> inputs, ILayer inputLayer, IList<ILayer> hiddenLayers, ILayer outputLayer, IList<Synapse> outputs)
+        public NeuralNetwork(IList<Synapse> inputs, ILayer inputLayer, IList<ILayer> hiddenLayers, ILayer outputLayer, IList<Synapse> outputs)
         {
             Inputs = inputs;
             InputLayer = inputLayer;

@@ -11,7 +11,7 @@ namespace ArtificialNeuralNetwork
         public IActivationFunction ActivationFunction { get; set; }
         public double Value { get; private set; }
 
-        private Axon(IList<Synapse> terminals, IActivationFunction activationFunction)
+        public Axon(IList<Synapse> terminals, IActivationFunction activationFunction)
         {
             ActivationFunction = activationFunction;
             Terminals = terminals;

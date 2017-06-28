@@ -9,7 +9,7 @@ namespace ArtificialNeuralNetwork
         public ISoma Soma { get; set; }
         public IAxon Axon { get; set; }
 
-        private Neuron(ISoma soma, IAxon axon)
+        public Neuron(ISoma soma, IAxon axon)
         {
             Soma = soma;
             Axon = axon;
