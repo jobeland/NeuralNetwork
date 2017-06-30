@@ -44,6 +44,8 @@
     <Compile Include="ActivationFunctions\IActivationFunction.cs" />
     <Compile Include="ActivationFunctions\IdentityActivationFunction.cs" />
     <Compile Include="ActivationFunctions\InverseActivationFunction.cs" />
+    <Compile Include="ActivationFunctions\LeakyRectifiedLinearActivationFunction.cs" />
+    <Compile Include="ActivationFunctions\RectifiedLinearActivationFunction.cs" />
     <Compile Include="ActivationFunctions\SechActivationFunction.cs" />
     <Compile Include="ActivationFunctions\SigmoidActivationFunction.cs" />
     <Compile Include="ActivationFunctions\SinhActivationFunction.cs" />
